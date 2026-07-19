@@ -156,6 +156,8 @@ model Order {
   shippingDistrict String
   shippingAddress String
   paid        Boolean     @default(false)
+  razorpayOrderId   String? @unique
+  razorpayPaymentId String? @unique
   createdAt   DateTime    @default(now())
 
   items       OrderItem[]

@@ -1,0 +1,300 @@
+<title>TN School Cart — Database Maintenance Guide</title>
+<style>
+  :root {
+    --paper: #F7F8F7;
+    --paper-raised: #FFFFFF;
+    --ink: #1E2226;
+    --ink-soft: #616B73;
+    --rule: #DCE1E4;
+    --rule-strong: #C1C9CE;
+    --accent: #3A4A5C;
+    --accent-soft: #E1E6EA;
+    --accent-ink: #253141;
+    --good: #2E7D4F;
+    --good-soft: #E1F1E7;
+    --warn: #93600F;
+    --warn-soft: #FBEED9;
+    --bad: #A23B2E;
+    --bad-soft: #F6E1DD;
+    --code-bg: #1E2226;
+    --code-ink: #E8EBED;
+    --code-accent: #8FA6BC;
+    --font-display: "Iowan Old Style", "Sitka Small", "Source Serif Pro", Palatino, "Palatino Linotype", Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #16181A; --paper-raised: #1F2224; --ink: #E7EAEC; --ink-soft: #9AA3AA;
+      --rule: #33383C; --rule-strong: #454C51;
+      --accent: #8FA6BC; --accent-soft: #232C34; --accent-ink: #C7D6E2;
+      --good: #79D19E; --good-soft: #1C3327; --warn: #E8BE6A; --warn-soft: #3A2F16;
+      --bad: #E39184; --bad-soft: #3A241F;
+      --code-bg: #0E1012; --code-ink: #E7EAEC; --code-accent: #8FA6BC;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #16181A; --paper-raised: #1F2224; --ink: #E7EAEC; --ink-soft: #9AA3AA;
+    --rule: #33383C; --rule-strong: #454C51;
+    --accent: #8FA6BC; --accent-soft: #232C34; --accent-ink: #C7D6E2;
+    --good: #79D19E; --good-soft: #1C3327; --warn: #E8BE6A; --warn-soft: #3A2F16;
+    --bad: #E39184; --bad-soft: #3A241F;
+    --code-bg: #0E1012; --code-ink: #E7EAEC; --code-accent: #8FA6BC;
+  }
+  :root[data-theme="light"] {
+    --paper: #F7F8F7; --paper-raised: #FFFFFF; --ink: #1E2226; --ink-soft: #616B73;
+    --rule: #DCE1E4; --rule-strong: #C1C9CE;
+    --accent: #3A4A5C; --accent-soft: #E1E6EA; --accent-ink: #253141;
+    --good: #2E7D4F; --good-soft: #E1F1E7; --warn: #93600F; --warn-soft: #FBEED9;
+    --bad: #A23B2E; --bad-soft: #F6E1DD;
+    --code-bg: #1E2226; --code-ink: #E8EBED; --code-accent: #8FA6BC;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 820px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
+
+  .kicker { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 0.6rem; }
+  .kicker::before { content: ""; width: 1.6rem; height: 1px; background: var(--accent); display: inline-block; }
+  h1.doc-title { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 5vw, 2.65rem); line-height: 1.12; margin: 0.6rem 0 0.4rem; text-wrap: balance; }
+  .doc-sub { color: var(--ink-soft); font-size: 1.05rem; max-width: 52ch; }
+  .doc-meta { margin-top: 1.4rem; display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--ink-soft); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 0.8rem 0; }
+  .doc-meta strong { color: var(--ink); font-weight: 600; }
+  .doc-meta code { font-family: var(--font-mono); font-size: 0.85em; }
+
+  nav.toc { margin: 2.2rem 0 3rem; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px; padding: 1.1rem 1.3rem; }
+  nav.toc p { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 0.6rem; }
+  nav.toc ol { columns: 2; column-gap: 1.5rem; margin: 0; padding: 0; list-style: none; font-size: 0.9rem; }
+  nav.toc li { break-inside: avoid; margin-bottom: 0.35rem; }
+  nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; }
+  nav.toc a:hover { border-bottom-color: var(--accent); color: var(--accent-ink); }
+  nav.toc .n { font-family: var(--font-mono); color: var(--accent); margin-right: 0.45em; }
+
+  section.chapter { margin-top: 3.2rem; scroll-margin-top: 1.5rem; }
+  h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.9rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--rule-strong); text-wrap: balance; }
+  h3 { font-family: var(--font-body); font-size: 1rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
+  p { max-width: 72ch; margin: 0 0 0.9rem; }
+  ul, ol.steps { max-width: 72ch; padding-left: 0; margin: 0 0 1rem; }
+
+  ol.steps { counter-reset: step; list-style: none; }
+  ol.steps > li { counter-increment: step; position: relative; padding: 0 0 1rem 2.6rem; margin-bottom: 0.2rem; }
+  ol.steps > li::before { content: counter(step); font-family: var(--font-mono); font-size: 0.78rem; position: absolute; left: 0; top: 0.05rem; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); display: flex; align-items: center; justify-content: center; font-weight: 600; }
+  ol.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 0.85rem; top: 1.9rem; bottom: -0.4rem; width: 1px; background: var(--rule); }
+
+  ul.plain { list-style: none; padding: 0; }
+  ul.plain li { padding-left: 1.1rem; position: relative; margin-bottom: 0.45rem; }
+  ul.plain li::before { content: "–"; position: absolute; left: 0; color: var(--ink-soft); }
+
+  code { font-family: var(--font-mono); font-size: 0.88em; background: var(--accent-soft); color: var(--accent-ink); padding: 0.1em 0.35em; border-radius: 3px; }
+  pre { background: var(--code-bg); color: var(--code-ink); font-family: var(--font-mono); font-size: 0.85rem; padding: 1rem 1.2rem; border-radius: 6px; overflow-x: auto; margin: 0.8rem 0 1.3rem; line-height: 1.6; }
+  pre code { background: none; color: inherit; padding: 0; }
+  pre .c { color: var(--code-accent); }
+
+  .callout { max-width: 72ch; border-left: 3px solid var(--accent); background: var(--paper-raised); padding: 0.85rem 1.1rem; border-radius: 0 4px 4px 0; margin: 1.1rem 0 1.3rem; font-size: 0.94rem; }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout.bad { border-left-color: var(--bad); }
+  .callout .label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 0.3rem; }
+  .callout.warn .label { color: var(--warn); }
+  .callout.bad .label { color: var(--bad); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  table.field-table { width: 100%; border-collapse: collapse; margin: 0.8rem 0 1.3rem; font-size: 0.87rem; }
+  table.field-table th, table.field-table td { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  table.field-table th { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  table.field-table td code { white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+
+  .model-card { border: 1px solid var(--rule); border-radius: 6px; padding: 1rem 1.2rem; margin-bottom: 1rem; background: var(--paper-raised); }
+  .model-card h4 { font-family: var(--font-mono); font-size: 0.95rem; margin: 0 0 0.5rem; color: var(--accent-ink); }
+  .model-card .fields { font-size: 0.85rem; color: var(--ink-soft); }
+  .model-card .fields code { background: none; padding: 0; color: var(--ink); }
+
+  .checklist { max-width: 72ch; list-style: none; padding: 0; margin: 0.8rem 0 1.3rem; }
+  .checklist li { display: flex; gap: 0.6rem; padding: 0.4rem 0; border-bottom: 1px dashed var(--rule); font-size: 0.94rem; }
+  .checklist li::before { content: "☐"; color: var(--accent); flex-shrink: 0; font-size: 1.05em; }
+
+  .contact-card { margin-top: 3.6rem; background: var(--accent-ink); color: var(--paper); border-radius: 6px; padding: 1.8rem 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .contact-card h4 { font-family: var(--font-display); font-size: 1.25rem; margin: 0 0 0.2rem; font-weight: 600; }
+  .contact-card p { margin: 0; opacity: 0.85; font-size: 0.9rem; }
+  .contact-card a.btn { background: #25D366; color: #08331C; font-weight: 700; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 5px; font-size: 0.9rem; white-space: nowrap; }
+  .contact-card a.btn.alt { background: var(--paper); color: var(--accent-ink); }
+
+  @media print { nav.toc, .contact-card a.btn { display: none; } body { background: #fff; color: #000; } .page { max-width: 100%; padding: 0; } pre { white-space: pre-wrap; } }
+  @media (max-width: 560px) { nav.toc ol { columns: 1; } .contact-card { flex-direction: column; align-items: flex-start; } }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="page">
+  <p class="kicker">TN School Cart · Technical reference</p>
+  <h1 class="doc-title">Database Maintenance Guide</h1>
+  <p class="doc-sub">How TN School Cart's data layer is built, where it lives, and how to change, inspect, back up, and secure it safely.</p>
+  <div class="doc-meta">
+    <span>Stack: <strong>Next.js 16 · Prisma 7 · PostgreSQL (Neon)</strong></span>
+    <span>Hosting: <strong>Vercel</strong></span>
+    <span>Repo: <strong><code>github.com/edwintools50/tn-school-cart</code></strong></span>
+  </div>
+
+  <nav class="toc" aria-label="Contents">
+    <p>In this guide</p>
+    <ol>
+      <li><span class="n">1</span><a href="#overview">How the pieces fit together</a></li>
+      <li><span class="n">2</span><a href="#model">The data model</a></li>
+      <li><span class="n">3</span><a href="#access">Where the database lives</a></li>
+      <li><span class="n">4</span><a href="#inspect">Everyday inspection</a></li>
+      <li><span class="n">5</span><a href="#migrate">Making schema changes safely</a></li>
+      <li><span class="n">6</span><a href="#category">Worked example: new category</a></li>
+      <li><span class="n">7</span><a href="#backup">Backups &amp; disaster recovery</a></li>
+      <li><span class="n">8</span><a href="#pooling">Connection pooling — action needed</a></li>
+      <li><span class="n">9</span><a href="#monitor">Monitoring</a></li>
+      <li><span class="n">10</span><a href="#secrets">Environment variables &amp; secrets</a></li>
+      <li><span class="n">11</span><a href="#seed">Seeding &amp; demo data</a></li>
+      <li><span class="n">12</span><a href="#launch">Before going fully live</a></li>
+    </ol>
+  </nav>
+
+  <section class="chapter" id="overview">
+    <h2>1 · How the pieces fit together</h2>
+    <p>TN School Cart is a single Next.js application. It doesn't have a separate backend server — pages and Server Actions talk to the database directly through <strong>Prisma</strong>, an ORM that turns the schema in <code>prisma/schema.prisma</code> into type-safe database calls.</p>
+    <p>The database itself is <strong>PostgreSQL</strong>, hosted on <strong>Neon</strong> (a serverless Postgres provider). Neon isn't baked into the code — it's just "a Postgres server," reached through a connection string stored in the <code>DATABASE_URL</code> environment variable. The app connects to it via <code>@prisma/adapter-pg</code>, defined in <code>src/lib/db.ts</code>.</p>
+    <div class="table-wrap">
+      <table class="field-table">
+        <tr><th>Piece</th><th>Where</th><th>Purpose</th></tr>
+        <tr><td>Schema</td><td><code>prisma/schema.prisma</code></td><td>Defines every table, field, and relationship</td></tr>
+        <tr><td>Migrations</td><td><code>prisma/migrations/</code></td><td>Versioned SQL history of every schema change, applied in order</td></tr>
+        <tr><td>Client singleton</td><td><code>src/lib/db.ts</code></td><td>The connected Prisma client every page/action imports as <code>db</code></td></tr>
+        <tr><td>Seed script</td><td><code>prisma/seed.ts</code></td><td>Creates demo accounts, products, and services</td></tr>
+        <tr><td>Live data</td><td>Neon (console.neon.tech)</td><td>The actual Postgres server</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="chapter" id="model">
+    <h2>2 · The data model</h2>
+    <p>Eight models. Every user — principal, supplier, worker, or admin — is a single <code>User</code> row distinguished by a <code>role</code>.</p>
+
+    <div class="model-card">
+      <h4>User</h4>
+      <p class="fields"><code>role</code> (PRINCIPAL / SUPPLIER / WORKER / ADMIN) · <code>status</code> (PENDING / APPROVED / REJECTED / SUSPENDED) · contact &amp; role-specific fields (<code>schoolName</code>/<code>district</code> for principals, <code>businessName</code>/<code>serviceArea</code> for suppliers &amp; workers)</p>
+    </div>
+    <div class="model-card">
+      <h4>Product → CartItem → Order → OrderItem</h4>
+      <p class="fields">A <code>Product</code> belongs to a supplier <code>User</code> and has a moderation <code>status</code>. Buyers accumulate <code>CartItem</code>s, and checkout turns them into one <code>Order</code> containing several <code>OrderItem</code>s — each item keeps its own <code>status</code> (Placed/Confirmed/Shipped/Delivered/Cancelled) and a snapshot of the price/title at the time of order, so later edits to the product don't rewrite order history.</p>
+    </div>
+    <div class="model-card">
+      <h4>GigService → GigRequest → GigOffer</h4>
+      <p class="fields">A <code>GigService</code> is a worker's listing (moderated, same as products). A <code>GigRequest</code> is a job a principal posts; workers respond with <code>GigOffer</code>s. Accepting an offer sets the request's <code>status</code> to ASSIGNED and the offer's <code>status</code> to ACCEPTED, auto-rejecting the rest.</p>
+    </div>
+
+    <h3>Category enums</h3>
+    <p><code>ProductCategory</code> and <code>GigCategory</code> are plain string enums in the schema — Postgres stores them as text, so adding a new one is a schema edit, not a data migration (see §6).</p>
+  </section>
+
+  <section class="chapter" id="access">
+    <h2>3 · Where the database lives</h2>
+    <ol class="steps">
+      <li>Log in at <strong>console.neon.tech</strong> with the account that created the project.</li>
+      <li>Open the <strong>tn-school-cart</strong> project. The dashboard shows compute usage, storage, and active connections.</li>
+      <li><strong>Connection Details</strong> is where the connection string lives — this is the value stored as <code>DATABASE_URL</code> in Vercel's environment variables. Treat it like a password: whoever has it has full read/write access to every school, order, and account on the platform.</li>
+    </ol>
+  </section>
+
+  <section class="chapter" id="inspect">
+    <h2>4 · Everyday inspection</h2>
+    <p>Two ways to look at the data without writing raw SQL:</p>
+    <h3>Prisma Studio (recommended for quick lookups)</h3>
+    <pre><span class="c"># from the project folder, with DATABASE_URL set in .env</span>
+npx prisma studio</pre>
+    <p>Opens a local browser UI where you can browse, filter, and edit every table with a spreadsheet-like interface — the fastest way to check "did this order actually get created?" or manually fix a single row.</p>
+    <h3>Neon's SQL editor</h3>
+    <p>Inside the Neon dashboard, the <strong>SQL Editor</strong> tab lets you run raw queries directly against production — useful for aggregate questions ("how many orders this week?") that Prisma Studio isn't built for.</p>
+  </section>
+
+  <section class="chapter" id="migrate">
+    <h2>5 · Making schema changes safely</h2>
+    <p>Never hand-edit tables in Neon to add a column — always go through Prisma's migration system so the schema file, the migration history, and the actual database stay in sync.</p>
+    <ol class="steps">
+      <li>Edit <code>prisma/schema.prisma</code> with the change you want.</li>
+      <li>Run <code>npx prisma migrate dev --name describe_your_change</code> locally. This creates a new file under <code>prisma/migrations/</code>, applies it to your local/dev database, and regenerates the Prisma client.</li>
+      <li>Test the change locally (<code>npm run dev</code>).</li>
+      <li>Commit the new migration folder along with your code changes, and push.</li>
+      <li>Apply the same migration to production: <code>DATABASE_URL="&lt;production connection string&gt;" npx prisma migrate deploy</code>. This runs any migrations Neon hasn't seen yet — it does not touch data outside what the migration specifies.</li>
+      <li>Vercel redeploys automatically on push; its build step runs <code>prisma generate</code> (via the <code>postinstall</code> script) so the deployed app matches the new schema.</li>
+    </ol>
+    <div class="callout warn">
+      <span class="label">Order matters</span>
+      <p>Run <code>migrate deploy</code> against production <em>before or immediately after</em> the code that depends on it goes live — if the deployed code expects a column that doesn't exist in the production database yet, requests touching that table will error.</p>
+    </div>
+  </section>
+
+  <section class="chapter" id="category">
+    <h2>6 · Worked example: adding a new marketplace category</h2>
+    <p>This is the concrete version of what the Admin Handbook refers suppliers/workers to you for.</p>
+    <ol class="steps">
+      <li>In <code>prisma/schema.prisma</code>, add the new value inside <code>enum ProductCategory</code> or <code>enum GigCategory</code>.</li>
+      <li>Run <code>npx prisma migrate dev --name add_category_x</code> (for Postgres text-enum columns this is usually a no-op at the SQL level, but keeps history consistent).</li>
+      <li>Add a human-readable label for it in <code>src/lib/constants.ts</code> — <code>PRODUCT_CATEGORY_LABELS</code> or <code>GIG_CATEGORY_LABELS</code>. Every dropdown and filter on the site reads from this file, so this one line is all the UI needs.</li>
+      <li>Commit, push, and deploy as in §5.</li>
+    </ol>
+  </section>
+
+  <section class="chapter" id="backup">
+    <h2>7 · Backups &amp; disaster recovery</h2>
+    <p>Neon keeps a rolling history of your database automatically (point-in-time restore), letting you branch or roll back to an earlier moment from the Neon dashboard — the retention window depends on your Neon plan, so check <strong>Settings → Backup/Restore</strong> in the Neon console for exactly how far back you can go.</p>
+    <p>For an extra manual snapshot before a risky change (a big migration, a bulk data fix), take one yourself:</p>
+    <pre><span class="c"># requires the postgres client tools (pg_dump) installed locally</span>
+pg_dump "&lt;production DATABASE_URL&gt;" -f backup-$(date +%Y%m%d).sql</pre>
+  </section>
+
+  <section class="chapter" id="pooling">
+    <h2>8 · Connection pooling — action needed</h2>
+    <div class="callout bad">
+      <span class="label">Flag for follow-up</span>
+      <p>The <code>DATABASE_URL</code> currently in use points at Neon's <strong>direct</strong> connection endpoint (no <code>-pooler</code> in the hostname). Vercel runs the app as serverless functions, and under real traffic each concurrent request can open its own database connection — Postgres (and Neon's free-tier direct endpoint) has a limited connection ceiling, so this will eventually cause connection errors under load, even though it works fine at low/demo traffic today.</p>
+    </div>
+    <p><strong>Fix:</strong> in the Neon dashboard, under <strong>Connection Details</strong>, toggle <strong>Pooled connection</strong> — it gives you a connection string with <code>-pooler</code> in the hostname, backed by PgBouncer. Swap that in as the <code>DATABASE_URL</code> in Vercel's environment variables (no code changes needed) and redeploy. Do this before the site has meaningful real-world order volume.</p>
+  </section>
+
+  <section class="chapter" id="monitor">
+    <h2>9 · Monitoring</h2>
+    <ul class="plain">
+      <li><strong>Neon dashboard</strong> — compute hours used, storage, and active connections. Free-tier compute auto-suspends after inactivity and cold-starts on the next request (this is why the very first request after idle time can feel slow).</li>
+      <li><strong>Vercel dashboard → your project → Logs</strong> — every server error (including database errors) from production shows up here in real time, filterable by route.</li>
+    </ul>
+  </section>
+
+  <section class="chapter" id="secrets">
+    <h2>10 · Environment variables &amp; secrets</h2>
+    <div class="table-wrap">
+      <table class="field-table">
+        <tr><th>Variable</th><th>Purpose</th><th>Rotating it</th></tr>
+        <tr><td><code>DATABASE_URL</code></td><td>Postgres connection string</td><td>Reset the password in Neon → update in Vercel env vars → redeploy</td></tr>
+        <tr><td><code>SESSION_SECRET</code></td><td>Signs login session cookies</td><td>Changing it instantly logs every user out (all existing session tokens become invalid) — safe to do, just expect a wave of re-logins</td></tr>
+      </table>
+    </div>
+    <p>Both live only in Vercel's <strong>Project Settings → Environment Variables</strong> and in each developer's local <code>.env</code> file (which is git-ignored) — never in code or committed files.</p>
+  </section>
+
+  <section class="chapter" id="seed">
+    <h2>11 · Seeding &amp; demo data</h2>
+    <p><code>npm run seed</code> runs <code>prisma/seed.ts</code>, which upserts (by email) a set of demo accounts, products, and services. It's safe to re-run against a <em>fresh or staging</em> database — but avoid running it against production once real schools and vendors have signed up, since its purpose is demo/testing data, not something a live marketplace needs re-added.</p>
+  </section>
+
+  <section class="chapter" id="launch">
+    <h2>12 · Before going fully live</h2>
+    <ul class="checklist">
+      <li>Switch <code>DATABASE_URL</code> to Neon's <strong>pooled</strong> connection string (§8).</li>
+      <li>Change the seeded admin password (<code>admin@tnschoolcart.in</code>) away from the demo default — it's written in this project's README and known to anyone who's read it.</li>
+      <li>Decide whether to keep or remove the seeded demo accounts/listings once real suppliers and workers are onboarding.</li>
+      <li>Confirm <code>SESSION_SECRET</code> in Vercel is the production value generated for this deployment, not the placeholder committed in the repo's <code>.env</code> for local dev.</li>
+      <li>Set a reminder to check Neon's plan limits (storage, compute hours) as real usage grows.</li>
+    </ul>
+  </section>
+
+  <div class="contact-card">
+    <div>
+      <h4>Questions about the database or infrastructure?</h4>
+      <p>Reach the developer/maintainer, or via WhatsApp for anything urgent.</p>
+    </div>
+    <a class="btn" href="https://wa.me/919943980008?text=Hi%2C%20I%20have%20a%20technical%20question%20about%20TN%20School%20Cart%27s%20database." target="_blank" rel="noopener noreferrer">Chat on WhatsApp →</a>
+  </div>
+</div>

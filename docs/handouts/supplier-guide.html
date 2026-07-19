@@ -1,0 +1,230 @@
+<title>TN School Cart — Supplier Handbook</title>
+<style>
+  :root {
+    --paper: #FAF8F3;
+    --paper-raised: #FFFFFF;
+    --ink: #23211C;
+    --ink-soft: #6B6558;
+    --rule: #E4DECD;
+    --rule-strong: #CBC3AC;
+    --accent: #9C4A22;
+    --accent-soft: #F3E1D5;
+    --accent-ink: #6E3316;
+    --good: #2E7D4F;
+    --good-soft: #E1F1E7;
+    --warn: #93600F;
+    --warn-soft: #FBEED9;
+    --font-display: "Iowan Old Style", "Sitka Small", "Source Serif Pro", Palatino, "Palatino Linotype", Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1C1A16; --paper-raised: #242119; --ink: #EEE9DC; --ink-soft: #A8A092;
+      --rule: #3A3527; --rule-strong: #4A4433;
+      --accent: #E28A5C; --accent-soft: #3B281C; --accent-ink: #F2C7AA;
+      --good: #79D19E; --good-soft: #1C3327; --warn: #E8BE6A; --warn-soft: #3A2F16;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1C1A16; --paper-raised: #242119; --ink: #EEE9DC; --ink-soft: #A8A092;
+    --rule: #3A3527; --rule-strong: #4A4433;
+    --accent: #E28A5C; --accent-soft: #3B281C; --accent-ink: #F2C7AA;
+    --good: #79D19E; --good-soft: #1C3327; --warn: #E8BE6A; --warn-soft: #3A2F16;
+  }
+  :root[data-theme="light"] {
+    --paper: #FAF8F3; --paper-raised: #FFFFFF; --ink: #23211C; --ink-soft: #6B6558;
+    --rule: #E4DECD; --rule-strong: #CBC3AC;
+    --accent: #9C4A22; --accent-soft: #F3E1D5; --accent-ink: #6E3316;
+    --good: #2E7D4F; --good-soft: #E1F1E7; --warn: #93600F; --warn-soft: #FBEED9;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-body); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 760px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
+
+  .kicker { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 0.6rem; }
+  .kicker::before { content: ""; width: 1.6rem; height: 1px; background: var(--accent); display: inline-block; }
+  h1.doc-title { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 5vw, 2.75rem); line-height: 1.12; margin: 0.6rem 0 0.4rem; text-wrap: balance; }
+  .doc-sub { color: var(--ink-soft); font-size: 1.05rem; max-width: 42ch; }
+  .doc-meta { margin-top: 1.4rem; display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--ink-soft); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 0.8rem 0; }
+  .doc-meta strong { color: var(--ink); font-weight: 600; }
+
+  nav.toc { margin: 2.2rem 0 3rem; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px; padding: 1.1rem 1.3rem; }
+  nav.toc p { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 0.6rem; }
+  nav.toc ol { columns: 2; column-gap: 1.5rem; margin: 0; padding: 0; list-style: none; font-size: 0.92rem; }
+  nav.toc li { break-inside: avoid; margin-bottom: 0.35rem; }
+  nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; }
+  nav.toc a:hover { border-bottom-color: var(--accent); color: var(--accent-ink); }
+  nav.toc .n { font-family: var(--font-mono); color: var(--accent); margin-right: 0.45em; }
+
+  section.chapter { margin-top: 3.4rem; scroll-margin-top: 1.5rem; }
+  h2 { font-family: var(--font-display); font-size: 1.55rem; font-weight: 600; margin: 0 0 0.9rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--rule-strong); text-wrap: balance; }
+  h3 { font-family: var(--font-body); font-size: 1.02rem; font-weight: 700; margin: 1.6rem 0 0.5rem; }
+  p { max-width: 66ch; margin: 0 0 0.9rem; }
+  ul, ol.steps { max-width: 66ch; padding-left: 0; margin: 0 0 1rem; }
+
+  ol.steps { counter-reset: step; list-style: none; }
+  ol.steps > li { counter-increment: step; position: relative; padding: 0 0 1rem 2.6rem; margin-bottom: 0.2rem; }
+  ol.steps > li::before { content: counter(step); font-family: var(--font-mono); font-size: 0.78rem; position: absolute; left: 0; top: 0.05rem; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); display: flex; align-items: center; justify-content: center; font-weight: 600; }
+  ol.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 0.85rem; top: 1.9rem; bottom: -0.4rem; width: 1px; background: var(--rule); }
+
+  ul.plain { list-style: none; padding: 0; }
+  ul.plain li { padding-left: 1.1rem; position: relative; margin-bottom: 0.4rem; }
+  ul.plain li::before { content: "–"; position: absolute; left: 0; color: var(--ink-soft); }
+
+  .callout { max-width: 66ch; border-left: 3px solid var(--accent); background: var(--paper-raised); padding: 0.85rem 1.1rem; border-radius: 0 4px 4px 0; margin: 1.1rem 0 1.3rem; font-size: 0.94rem; }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout .label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 0.3rem; }
+  .callout.warn .label { color: var(--warn); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .pill-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.6rem 0 1.2rem; }
+  .pill { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.28rem 0.65rem; border-radius: 999px; border: 1px solid var(--rule-strong); color: var(--ink-soft); }
+  .pill.placed { background: var(--accent-soft); color: var(--accent-ink); border-color: transparent; }
+  .pill.done { background: var(--good-soft); color: var(--good); border-color: transparent; }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+
+  table.field-table { width: 100%; border-collapse: collapse; margin: 0.8rem 0 1.3rem; font-size: 0.9rem; }
+  table.field-table th, table.field-table td { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  table.field-table th { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  .table-wrap { overflow-x: auto; }
+
+  .faq dt { font-weight: 700; margin-top: 1.1rem; }
+  .faq dd { margin: 0.25rem 0 0; color: var(--ink-soft); max-width: 62ch; }
+
+  .contact-card { margin-top: 3.6rem; background: var(--accent-ink); color: var(--paper); border-radius: 6px; padding: 1.8rem 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .contact-card h4 { font-family: var(--font-display); font-size: 1.3rem; margin: 0 0 0.2rem; font-weight: 600; }
+  .contact-card p { margin: 0; opacity: 0.85; font-size: 0.92rem; }
+  .contact-card a.btn { background: #25D366; color: #08331C; font-weight: 700; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 5px; font-size: 0.92rem; white-space: nowrap; }
+
+  @media print { nav.toc, .contact-card a.btn { display: none; } body { background: #fff; color: #000; } .page { max-width: 100%; padding: 0; } }
+  @media (max-width: 560px) { nav.toc ol { columns: 1; } .contact-card { flex-direction: column; align-items: flex-start; } }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="page">
+  <p class="kicker">TN School Cart · Handbook 2 of 4</p>
+  <h1 class="doc-title">For Suppliers</h1>
+  <p class="doc-sub">How to list products, get approved, and fulfil orders from schools across Tamil Nadu on tnschoolcart.com.</p>
+  <div class="doc-meta">
+    <span>Audience: <strong>Suppliers (stationery, furniture, IT, uniforms, etc.)</strong></span>
+    <span>Site: <strong>tnschoolcart.com</strong></span>
+    <span>Support: <strong>WhatsApp +91 99439 80008</strong></span>
+  </div>
+
+  <nav class="toc" aria-label="Contents">
+    <p>In this handbook</p>
+    <ol>
+      <li><span class="n">1</span><a href="#account">Signing up &amp; getting approved</a></li>
+      <li><span class="n">2</span><a href="#list">Listing your first product</a></li>
+      <li><span class="n">3</span><a href="#status">Understanding listing status</a></li>
+      <li><span class="n">4</span><a href="#edit">Editing or delisting</a></li>
+      <li><span class="n">5</span><a href="#orders">Fulfilling orders</a></li>
+      <li><span class="n">6</span><a href="#payment">Getting paid</a></li>
+      <li><span class="n">7</span><a href="#practices">Good-listing checklist</a></li>
+      <li><span class="n">8</span><a href="#faq">Questions &amp; answers</a></li>
+    </ol>
+  </nav>
+
+  <section class="chapter" id="account">
+    <h2>1 · Signing up &amp; getting approved</h2>
+    <ol class="steps">
+      <li>Go to <strong>tnschoolcart.com</strong> → <strong>Sign up</strong> → choose <strong>Supplier (Seller)</strong>.</li>
+      <li>Fill in your name, email, phone, a password, your <strong>business name</strong>, and the <strong>district</strong> you serve.</li>
+      <li>Click <strong>Create account</strong>. You're logged in right away and land on your Supplier Dashboard.</li>
+    </ol>
+    <div class="callout">
+      <span class="label">About approval</span>
+      <p>Unlike principals, supplier accounts start as <strong>Pending</strong> and need a quick review by the TN School Cart admin team before your listings can go live. You don't have to wait idle — you can prepare your product listings right away; they just won't be reviewed until your account is approved.</p>
+    </div>
+  </section>
+
+  <section class="chapter" id="list">
+    <h2>2 · Listing your first product</h2>
+    <p>From your dashboard, click <strong>+ Add product</strong> and fill in:</p>
+    <div class="table-wrap">
+      <table class="field-table">
+        <tr><th>Field</th><th>What to enter</th></tr>
+        <tr><td>Title</td><td>Clear product name, e.g. "Ruled Notebook 200 Pages (Pack of 10)"</td></tr>
+        <tr><td>Description</td><td>What it is, materials, sizing — enough for a principal to order confidently without seeing it in person</td></tr>
+        <tr><td>Category</td><td>Stationery, Furniture, Educational Content, Notebooks &amp; Books, Health &amp; Hygiene, Sports, IT &amp; Electronics, Exam &amp; Print Stationery, Uniforms &amp; Merchandise, or Other</td></tr>
+        <tr><td>Unit</td><td>How it's sold — piece, box, dozen, pack of 10, etc.</td></tr>
+        <tr><td>Price (₹)</td><td>Price per unit</td></tr>
+        <tr><td>Stock</td><td>How many units you currently have available</td></tr>
+        <tr><td>Image URL <em>(optional)</em></td><td>A link to a product photo hosted elsewhere</td></tr>
+      </table>
+    </div>
+    <p>Click <strong>Submit for review</strong>. Your product won't appear in the marketplace until an admin approves it.</p>
+  </section>
+
+  <section class="chapter" id="status">
+    <h2>3 · Understanding listing status</h2>
+    <div class="pill-row">
+      <span class="pill warn">Pending</span>
+      <span class="pill done">Approved</span>
+      <span class="pill">Rejected</span>
+      <span class="pill">Delisted</span>
+    </div>
+    <p>Your dashboard shows every product's status. If something is <strong>Rejected</strong>, the admin's reason is shown right there — fix the issue and edit the listing to resubmit it.</p>
+  </section>
+
+  <section class="chapter" id="edit">
+    <h2>4 · Editing or delisting</h2>
+    <ul class="plain">
+      <li><strong>Edit</strong> any listing to update price, stock, description, or category — saving sends it back to Pending for a quick re-check.</li>
+      <li><strong>Delist</strong> a product any time to pull it off the marketplace immediately (e.g. you've sold out for the season).</li>
+    </ul>
+  </section>
+
+  <section class="chapter" id="orders">
+    <h2>5 · Fulfilling orders</h2>
+    <p>Open <strong>Orders</strong> from your dashboard to see every order containing your products, with the school name, district, quantity, and price. Move each item forward as you fulfil it:</p>
+    <ol class="steps">
+      <li><strong>Confirm order</strong> — you've seen it and will prepare it.</li>
+      <li><strong>Mark shipped</strong> — it's on its way.</li>
+      <li><strong>Mark delivered</strong> — the school has received it.</li>
+    </ol>
+    <p>You can also <strong>Cancel</strong> an item while it's still in the "Placed" stage. A <strong>WhatsApp</strong> link sits next to every order item so you can message the school directly about delivery timing or details.</p>
+  </section>
+
+  <section class="chapter" id="payment">
+    <h2>6 · Getting paid</h2>
+    <div class="callout warn">
+      <span class="label">Important</span>
+      <p>TN School Cart does not process real payments yet — the app automatically marks orders "paid" at checkout so you can start preparing them, but no money actually moves through the platform. You'll need to collect payment from the school directly (bank transfer, cash, etc.) exactly as you would offline, and use the <strong>WhatsApp</strong> link on the order to confirm payment received.</p>
+    </div>
+  </section>
+
+  <section class="chapter" id="practices">
+    <h2>7 · Good-listing checklist</h2>
+    <ul class="plain">
+      <li>Keep <strong>stock counts accurate</strong> — schools can't order what shows as out of stock, and inaccurate stock leads to cancelled orders.</li>
+      <li>Update order status <strong>promptly</strong> so schools aren't left guessing.</li>
+      <li>Write titles the way a principal would search for the item, not internal product codes.</li>
+      <li>Double-check the category — a misfiled listing is harder for schools to find.</li>
+    </ul>
+  </section>
+
+  <section class="chapter" id="faq">
+    <h2>8 · Questions &amp; answers</h2>
+    <dl class="faq">
+      <dt>How long does approval take?</dt>
+      <dd>Usually 1–2 business days for your account, and similarly for each new listing.</dd>
+      <dt>Can I sell in more than one category?</dt>
+      <dd>Yes — list as many products across as many categories as you like from the same account.</dd>
+      <dt>What if my listing keeps getting rejected?</dt>
+      <dd>Check the rejection note on your dashboard, or message us on WhatsApp for specific feedback.</dd>
+      <dt>Can I change my service area later?</dt>
+      <dd>Message us on WhatsApp and we'll update it for you.</dd>
+    </dl>
+  </section>
+
+  <div class="contact-card">
+    <div>
+      <h4>Need help with your listings?</h4>
+      <p>Message TN School Cart support directly on WhatsApp.</p>
+    </div>
+    <a class="btn" href="https://wa.me/919943980008?text=Hi%20TN%20School%20Cart%2C%20I%27m%20a%20supplier%20and%20need%20help." target="_blank" rel="noopener noreferrer">Chat on WhatsApp →</a>
+  </div>
+</div>

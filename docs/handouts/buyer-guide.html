@@ -1,0 +1,385 @@
+<title>TN School Cart — Principal /HM Handbook</title>
+<style>
+  :root {
+    --paper: #FAF8F3;
+    --paper-raised: #FFFFFF;
+    --ink: #23211C;
+    --ink-soft: #6B6558;
+    --rule: #E4DECD;
+    --rule-strong: #CBC3AC;
+    --accent: #1B5E6E;
+    --accent-soft: #DCEAEA;
+    --accent-ink: #0E3540;
+    --good: #2E7D4F;
+    --good-soft: #E1F1E7;
+    --warn: #93600F;
+    --warn-soft: #FBEED9;
+    --font-display: "Iowan Old Style", "Sitka Small", "Source Serif Pro", Palatino, "Palatino Linotype", Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1C1A16; --paper-raised: #242119; --ink: #EEE9DC; --ink-soft: #A8A092;
+      --rule: #3A3527; --rule-strong: #4A4433;
+      --accent: #6BC7DA; --accent-soft: #1E3A3F; --accent-ink: #C6EAF0;
+      --good: #79D19E; --good-soft: #1C3327; --warn: #E8BE6A; --warn-soft: #3A2F16;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1C1A16; --paper-raised: #242119; --ink: #EEE9DC; --ink-soft: #A8A092;
+    --rule: #3A3527; --rule-strong: #4A4433;
+    --accent: #6BC7DA; --accent-soft: #1E3A3F; --accent-ink: #C6EAF0;
+    --good: #79D19E; --good-soft: #1C3327; --warn: #E8BE6A; --warn-soft: #3A2F16;
+  }
+  :root[data-theme="light"] {
+    --paper: #FAF8F3; --paper-raised: #FFFFFF; --ink: #23211C; --ink-soft: #6B6558;
+    --rule: #E4DECD; --rule-strong: #CBC3AC;
+    --accent: #1B5E6E; --accent-soft: #DCEAEA; --accent-ink: #0E3540;
+    --good: #2E7D4F; --good-soft: #E1F1E7; --warn: #93600F; --warn-soft: #FBEED9;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 760px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .kicker::before {
+    content: "";
+    width: 1.6rem; height: 1px; background: var(--accent);
+    display: inline-block;
+  }
+  h1.doc-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    line-height: 1.12;
+    margin: 0.6rem 0 0.4rem;
+    text-wrap: balance;
+  }
+  .doc-sub {
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    max-width: 42ch;
+  }
+  .doc-meta {
+    margin-top: 1.4rem;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 0.8rem 0;
+  }
+  .doc-meta strong { color: var(--ink); font-weight: 600; }
+
+  nav.toc {
+    margin: 2.2rem 0 3rem;
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+  }
+  nav.toc p {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.6rem;
+  }
+  nav.toc ol {
+    columns: 2;
+    column-gap: 1.5rem;
+    margin: 0; padding: 0; list-style: none;
+    font-size: 0.92rem;
+  }
+  nav.toc li { break-inside: avoid; margin-bottom: 0.35rem; }
+  nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; }
+  nav.toc a:hover { border-bottom-color: var(--accent); color: var(--accent-ink); }
+  nav.toc .n { font-family: var(--font-mono); color: var(--accent); margin-right: 0.45em; }
+
+  section.chapter { margin-top: 3.4rem; scroll-margin-top: 1.5rem; }
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    font-weight: 600;
+    margin: 0 0 0.9rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--rule-strong);
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--font-body);
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.5rem;
+  }
+  p { max-width: 66ch; margin: 0 0 0.9rem; }
+  ul, ol.steps { max-width: 66ch; padding-left: 0; margin: 0 0 1rem; }
+
+  ol.steps { counter-reset: step; list-style: none; }
+  ol.steps > li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 1rem 2.6rem;
+    margin-bottom: 0.2rem;
+  }
+  ol.steps > li::before {
+    content: counter(step);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    position: absolute; left: 0; top: 0.05rem;
+    width: 1.7rem; height: 1.7rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+  }
+  ol.steps > li:not(:last-child)::after {
+    content: "";
+    position: absolute; left: 0.85rem; top: 1.9rem; bottom: -0.4rem;
+    width: 1px; background: var(--rule);
+  }
+  ol.steps strong { color: var(--ink); }
+
+  ul.plain { list-style: none; padding: 0; }
+  ul.plain li { padding-left: 1.1rem; position: relative; margin-bottom: 0.4rem; }
+  ul.plain li::before { content: "–"; position: absolute; left: 0; color: var(--ink-soft); }
+
+  .callout {
+    max-width: 66ch;
+    border-left: 3px solid var(--accent);
+    background: var(--paper-raised);
+    padding: 0.85rem 1.1rem;
+    border-radius: 0 4px 4px 0;
+    margin: 1.1rem 0 1.3rem;
+    font-size: 0.94rem;
+  }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout .label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .callout.warn .label { color: var(--warn); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .pill-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.6rem 0 1.2rem; }
+  .pill {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--rule-strong);
+    color: var(--ink-soft);
+  }
+  .pill.placed { background: var(--accent-soft); color: var(--accent-ink); border-color: transparent; }
+  .pill.done { background: var(--good-soft); color: var(--good); border-color: transparent; }
+
+  table.field-table {
+    width: 100%; border-collapse: collapse; margin: 0.8rem 0 1.3rem; font-size: 0.9rem;
+  }
+  table.field-table th, table.field-table td {
+    text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  table.field-table th {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-soft); font-weight: 600;
+  }
+  .table-wrap { overflow-x: auto; }
+
+  .faq dt {
+    font-weight: 700; margin-top: 1.1rem; font-family: var(--font-body);
+  }
+  .faq dd { margin: 0.25rem 0 0; color: var(--ink-soft); max-width: 62ch; }
+
+  .contact-card {
+    margin-top: 3.6rem;
+    background: var(--accent-ink);
+    color: var(--paper);
+    border-radius: 6px;
+    padding: 1.8rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  :root[data-theme="dark"] .contact-card, @media (prefers-color-scheme: dark) { }
+  .contact-card h4 { font-family: var(--font-display); font-size: 1.3rem; margin: 0 0 0.2rem; font-weight: 600; }
+  .contact-card p { margin: 0; opacity: 0.85; font-size: 0.92rem; }
+  .contact-card a.btn {
+    background: #25D366; color: #08331C; font-weight: 700; text-decoration: none;
+    padding: 0.7rem 1.3rem; border-radius: 5px; font-size: 0.92rem; white-space: nowrap;
+  }
+
+  footer.print-footer { display: none; }
+  @media print {
+    nav.toc, .contact-card a.btn { display: none; }
+    body { background: #fff; color: #000; }
+    .page { max-width: 100%; padding: 0; }
+  }
+  @media (max-width: 560px) {
+    nav.toc ol { columns: 1; }
+    .contact-card { flex-direction: column; align-items: flex-start; }
+  }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="page">
+  <p class="kicker">TN School Cart · Handbook 1 of 4</p>
+  <h1 class="doc-title">For Principals &amp; HMs</h1>
+  <p class="doc-sub">How to order school supplies and hire gig workers through tnschoolcart.com — from signing up to getting the job done.</p>
+  <div class="doc-meta">
+    <span>Audience: <strong>School Principals / Head Masters (Buyers)</strong></span>
+    <span>Site: <strong>tnschoolcart.com</strong></span>
+    <span>Support: <strong>WhatsApp +91 99439 80008</strong></span>
+  </div>
+
+  <nav class="toc" aria-label="Contents">
+    <p>In this handbook</p>
+    <ol>
+      <li><span class="n">1</span><a href="#account">Creating your account</a></li>
+      <li><span class="n">2</span><a href="#browse">Finding supplies</a></li>
+      <li><span class="n">3</span><a href="#cart">Cart &amp; checkout</a></li>
+      <li><span class="n">4</span><a href="#tracking">Tracking your order</a></li>
+      <li><span class="n">5</span><a href="#gig-post">Requesting a service job</a></li>
+      <li><span class="n">6</span><a href="#gig-offers">Choosing a worker</a></li>
+      <li><span class="n">7</span><a href="#gig-manage">Managing the job</a></li>
+      <li><span class="n">8</span><a href="#whatsapp">Getting help fast</a></li>
+      <li><span class="n">9</span><a href="#faq">Questions &amp; answers</a></li>
+    </ol>
+  </nav>
+
+  <section class="chapter" id="account">
+    <h2>1 · Creating your account</h2>
+    <p>No approval wait for principals — you're ready to order the moment you sign up.</p>
+    <ol class="steps">
+      <li><strong>Go to tnschoolcart.com</strong> and click <strong>Sign up</strong> in the top right.</li>
+      <li>Choose <strong>Principal (Buyer)</strong> from the three role buttons at the top of the form.</li>
+      <li>Fill in your name, email, phone, a password, your <strong>school name</strong>, and your <strong>district</strong>.</li>
+      <li>Click <strong>Create account</strong>. You're logged in immediately and taken straight to the marketplace — no waiting for anyone to approve you.</li>
+    </ol>
+  </section>
+
+  <section class="chapter" id="browse">
+    <h2>2 · Finding supplies</h2>
+    <p>Everything suppliers have listed and TN School Cart's admin team has approved appears in the <strong>Marketplace</strong>.</p>
+    <ul class="plain">
+      <li>Use the <strong>search box</strong> to look for a product by name, or the <strong>category</strong> dropdown to browse one section at a time — Stationery, Furniture, Notebooks &amp; Books, Health &amp; Hygiene, IT &amp; Electronics, Exam &amp; Print Stationery, Uniforms &amp; Merchandise, and more.</li>
+      <li>Each product card shows the price, unit (per piece, per box, per pack, etc.), how many are in stock, and which supplier is selling it.</li>
+      <li>Click a product's title to see the full description and a bigger image before you order.</li>
+    </ul>
+  </section>
+
+  <section class="chapter" id="cart">
+    <h2>3 · Cart &amp; checkout</h2>
+    <ol class="steps">
+      <li>On any product, click <strong>Add to cart</strong>. You can adjust the quantity on the product page first, or change it later in your cart.</li>
+      <li>Click <strong>Cart</strong> in the top menu to review everything — update quantities, remove items, and see your running total.</li>
+      <li>Click <strong>Proceed to checkout</strong>. Confirm your school name, district, and type in the exact <strong>delivery address</strong>.</li>
+      <li>Click <strong>Place order</strong>. Your order is created immediately and marked as paid.</li>
+    </ol>
+    <div class="callout warn">
+      <span class="label">About payment</span>
+      <p>Checkout on TN School Cart does not collect real money yet — placing an order marks it "paid" automatically so suppliers can start preparing it. Please settle the actual payment with the supplier directly (bank transfer, cash, etc.) as you would normally, and use the <strong>Chat on WhatsApp</strong> button on your order to confirm you've paid.</p>
+    </div>
+  </section>
+
+  <section class="chapter" id="tracking">
+    <h2>4 · Tracking your order</h2>
+    <p>Open <strong>My Orders</strong> from the top menu any time to see every order you've placed and its status. Click into an order to see item-by-item progress:</p>
+    <div class="pill-row">
+      <span class="pill placed">Placed</span>
+      <span class="pill placed">Confirmed</span>
+      <span class="pill placed">Shipped</span>
+      <span class="pill done">Delivered</span>
+      <span class="pill">Cancelled</span>
+    </div>
+    <p>Each item moves through these stages as the supplier updates it on their end. If an order has multiple products from different suppliers, each one is tracked separately.</p>
+  </section>
+
+  <section class="chapter" id="gig-post">
+    <h2>5 · Requesting a service job</h2>
+    <p>Need a plumber, electrician, cleaning crew, painter, caterer, transport, or anything else campus-related? Post a gig request and workers in your area will send you offers.</p>
+    <ol class="steps">
+      <li>Go to <strong>Gig Requests</strong> or <strong>My Gig Requests</strong> in the top menu and click <strong>+ Post a gig request</strong>.
+        <br><span style="color:var(--ink-soft);font-size:0.9rem;">Tip: browsing <strong>Find Services</strong> first and clicking "Post a gig request for this" on a worker's listing pre-fills the right category for you.</span>
+      </li>
+      <li>Pick the <strong>type of work</strong> (plumbing, electrical, cleaning, painting/whitewashing, carpentry, IT/printer support, RO water purifier service, smart board/CCTV/broadband installation, printing services, catering, transport, and more).</li>
+      <li>Give it a clear <strong>job title</strong> and describe the work needed.</li>
+      <li>Confirm the school name, district and address, and optionally add a preferred date and budget.</li>
+      <li>Click <strong>Post gig request</strong>.</li>
+    </ol>
+  </section>
+
+  <section class="chapter" id="gig-offers">
+    <h2>6 · Choosing a worker</h2>
+    <p>Once your request is posted, gig workers in that category can send you an <strong>offer</strong> — their quoted price and a short message. Open your gig request any time to see every offer that's come in.</p>
+    <ol class="steps">
+      <li>Compare the quoted prices, messages, and each worker's listed service area.</li>
+      <li>Click <strong>Accept this offer</strong> on the one you want. The job is now assigned to that worker, and any other offers are automatically declined.</li>
+    </ol>
+  </section>
+
+  <section class="chapter" id="gig-manage">
+    <h2>7 · Managing the job</h2>
+    <p>Once a worker is assigned, only <strong>you</strong> (the school) can move the job forward — the worker doesn't have a button for this, so keep it updated as work happens:</p>
+    <ul class="plain">
+      <li><strong>Mark in progress</strong> — once the worker has started.</li>
+      <li><strong>Mark completed</strong> — once the job is finished, so you can confirm and close it out.</li>
+      <li><strong>Cancel job</strong> — available at any point if plans change.</li>
+    </ul>
+  </section>
+
+  <section class="chapter" id="whatsapp">
+    <h2>8 · Getting help fast</h2>
+    <p>A green WhatsApp button sits in the bottom-right corner of every page — click it any time to message TN School Cart support directly. On order and gig-request pages, a <strong>Chat on WhatsApp</strong> button also appears with the order or job details already typed in for you, so confirming, coordinating, or reporting an issue takes one tap.</p>
+  </section>
+
+  <section class="chapter" id="faq">
+    <h2>9 · Questions &amp; answers</h2>
+    <dl class="faq">
+      <dt>I forgot my password. What do I do?</dt>
+      <dd>There's no self-service reset yet — message us on WhatsApp and we'll help you regain access.</dd>
+      <dt>Can I cancel an order after placing it?</dt>
+      <dd>Once an item is Confirmed or later, ask the supplier directly via WhatsApp. While it's still "Placed," the supplier can cancel it from their side.</dd>
+      <dt>I can't find a category I need.</dt>
+      <dd>Message us on WhatsApp — new categories get added as more suppliers and workers join.</dd>
+      <dt>Do I pay through the website?</dt>
+      <dd>Not yet. See the payment note in section 3 — settle payment directly with the supplier or worker and confirm via WhatsApp.</dd>
+    </dl>
+  </section>
+
+  <div class="contact-card">
+    <div>
+      <h4>Still stuck?</h4>
+      <p>Message TN School Cart support directly on WhatsApp.</p>
+    </div>
+    <a class="btn" href="https://wa.me/919943980008?text=Hi%20TN%20School%20Cart%2C%20I%27m%20a%20principal%2FHM%20and%20need%20help." target="_blank" rel="noopener noreferrer">Chat on WhatsApp →</a>
+  </div>
+</div>

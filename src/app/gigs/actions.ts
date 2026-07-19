@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { GigCategory, GigRequestStatus } from "@/generated/prisma/enums";
+import { notifyGigAssigned, notifyGigOfferReceived, notifyGigStatusUpdate } from "@/lib/whatsapp-notify";
 
 export type ActionState = { error?: string } | undefined;
 
@@ -70,7 +71,10 @@ export async function submitOfferAction(
   }
   const { gigRequestId, quotedPrice, message } = parsed.data;
 
-  const gigRequest = await db.gigRequest.findUnique({ where: { id: gigRequestId } });
+  const gigRequest = await db.gigRequest.findUnique({
+    where: { id: gigRequestId },
+    include: { principal: true },
+  });
   if (!gigRequest || gigRequest.status !== "OPEN") {
     return { error: "This gig request is no longer open for offers." };
   }
@@ -81,6 +85,14 @@ export async function submitOfferAction(
     update: { quotedPrice, message, status: "PENDING" },
   });
 
+  await notifyGigOfferReceived({
+    phone: gigRequest.principal.phone,
+    principalName: gigRequest.principal.name,
+    workerName: user.businessName ?? user.name,
+    quotedPrice,
+    jobTitle: gigRequest.title,
+  });
+
   revalidatePath(`/gigs/${gigRequestId}`);
   return undefined;
 }
@@ -89,7 +101,10 @@ export async function acceptOfferAction(formData: FormData) {
   const user = await requireUser(["PRINCIPAL"]);
   const offerId = String(formData.get("offerId"));
 
-  const offer = await db.gigOffer.findUnique({ include: { gigRequest: true }, where: { id: offerId } });
+  const offer = await db.gigOffer.findUnique({
+    include: { gigRequest: true, worker: true },
+    where: { id: offerId },
+  });
   if (!offer || offer.gigRequest.principalId !== user.id) throw new Error("Not found");
   if (offer.gigRequest.status !== "OPEN") throw new Error("Request already assigned");
 
@@ -101,6 +116,13 @@ export async function acceptOfferAction(formData: FormData) {
     }),
     db.gigRequest.update({ where: { id: offer.gigRequestId }, data: { status: "ASSIGNED" } }),
   ]);
+
+  await notifyGigAssigned({
+    phone: offer.worker.phone,
+    workerName: offer.worker.businessName ?? offer.worker.name,
+    jobTitle: offer.gigRequest.title,
+    schoolName: offer.gigRequest.schoolName,
+  });
 
   revalidatePath(`/gigs/${offer.gigRequestId}`);
 }
@@ -116,7 +138,10 @@ export async function updateGigRequestStatusAction(formData: FormData) {
   const gigRequestId = String(formData.get("gigRequestId"));
   const status = String(formData.get("status"));
 
-  const gigRequest = await db.gigRequest.findUnique({ where: { id: gigRequestId } });
+  const gigRequest = await db.gigRequest.findUnique({
+    where: { id: gigRequestId },
+    include: { offers: { where: { status: "ACCEPTED" }, include: { worker: true } } },
+  });
   if (!gigRequest || gigRequest.principalId !== user.id) throw new Error("Not found");
 
   const allowed = requestStatusTransitions[gigRequest.status] ?? [];
@@ -126,6 +151,17 @@ export async function updateGigRequestStatusAction(formData: FormData) {
     where: { id: gigRequestId },
     data: { status: status as GigRequestStatus },
   });
+
+  const assignedWorker = gigRequest.offers[0]?.worker;
+  if (assignedWorker) {
+    await notifyGigStatusUpdate({
+      phone: assignedWorker.phone,
+      recipientName: assignedWorker.businessName ?? assignedWorker.name,
+      jobTitle: gigRequest.title,
+      schoolName: gigRequest.schoolName,
+      status,
+    });
+  }
 
   revalidatePath(`/gigs/${gigRequestId}`);
   revalidatePath("/gigs/mine");

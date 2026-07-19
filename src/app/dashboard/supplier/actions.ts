@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ProductCategory, OrderStatus } from "@/generated/prisma/enums";
+import { notifyOrderStatusUpdate } from "@/lib/whatsapp-notify";
 
 export type ActionState = { error?: string } | undefined;
 
@@ -100,12 +101,23 @@ export async function updateOrderItemStatusAction(formData: FormData) {
     throw new Error("Invalid status");
   }
 
-  const item = await db.orderItem.findUnique({ where: { id: orderItemId } });
+  const item = await db.orderItem.findUnique({
+    where: { id: orderItemId },
+    include: { order: { include: { buyer: true } } },
+  });
   if (!item || item.supplierId !== user.id) throw new Error("Not found");
 
   await db.orderItem.update({
     where: { id: orderItemId },
     data: { status: status as OrderStatus },
+  });
+
+  await notifyOrderStatusUpdate({
+    phone: item.order.buyer.phone,
+    buyerName: item.order.buyer.name,
+    orderShortId: item.order.id.slice(-8),
+    itemTitle: item.titleAtOrder,
+    status,
   });
 
   revalidatePath("/dashboard/supplier/orders");

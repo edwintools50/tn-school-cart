@@ -12,7 +12,8 @@ service listings.
 - Next.js 16 (App Router, Server Actions, TypeScript, Tailwind CSS v4)
 - Prisma 7 + PostgreSQL (via `@prisma/adapter-pg`)
 - Custom auth: bcrypt password hashing + `jose` JWT httpOnly session cookie
-- No external payment gateway — checkout is simulated (orders are marked paid immediately)
+- Razorpay for real checkout payments — falls back to a simulated "mark paid
+  immediately" flow when Razorpay isn't configured (see below)
 
 ## Getting started
 
@@ -77,6 +78,34 @@ new dedicated categories can be added later the same way (extend the
 `ProductCategory`/`GigCategory` enums in `prisma/schema.prisma`, then add
 labels in `src/lib/constants.ts`).
 
+## WhatsApp notifications
+
+`src/lib/whatsapp-notify.ts` sends automated WhatsApp template messages via
+Meta's Cloud API for: order placed, order status updates, new order alert
+(to supplier), gig offer received, gig assigned, and gig status updates.
+Requires `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID` env vars
+(from Meta for Developers → your app → WhatsApp) and the matching message
+templates approved in Meta's WhatsApp Manager. Without those env vars set,
+notification calls no-op with a console warning — everything else works
+normally. See `docs/handouts/database-maintenance.html` for the click-to-chat
+bubble (`src/lib/whatsapp.ts`), which is separate and always active.
+
+## Payments (Razorpay)
+
+`src/lib/razorpay.ts` + `src/app/orders/actions.ts` + `src/components/RazorpayPayButton.tsx`
+handle real checkout payments. When `NEXT_PUBLIC_RAZORPAY_KEY_ID` and
+`RAZORPAY_KEY_SECRET` are set, placing an order creates it unpaid and opens
+Razorpay's Checkout modal on the order page; a signed client callback plus a
+redundant webhook (`/api/webhooks/razorpay`, needs `RAZORPAY_WEBHOOK_SECRET`)
+both call the same idempotent `confirmOrderPayment()` to mark it paid and fire
+the WhatsApp order-placed / new-order notifications. Without those env vars,
+checkout falls back to marking orders paid immediately (no real payment
+collected) — safe for local dev before you've set up a Razorpay account.
+
+Test-mode keys (`rzp_test_...`) work immediately with no KYC — get them from
+the Razorpay dashboard → Settings → API Keys. Switch to live keys once your
+Razorpay account completes verification.
+
 ## Data model
 
 See `prisma/schema.prisma`. Key entities: `User` (role + approval status),
@@ -102,11 +131,13 @@ See the deployment guide the assistant provided in-session, or in short:
 
 1. Provision a Postgres database (Vercel → Storage tab → Neon, or Supabase).
 2. Push this repo to GitHub and import it in Vercel.
-3. In Vercel project settings, set `DATABASE_URL` (usually auto-set by the
-   Neon integration) and `SESSION_SECRET` (a long random string — don't reuse
-   the dev one in this repo).
-4. Run `npx prisma migrate deploy` once against the production `DATABASE_URL`
-   (from your machine, with `DATABASE_URL` pointed at prod) to create the
-   tables, then optionally `npm run seed` for demo data.
+3. In Vercel project settings, set `DATABASE_URL` to Neon's **pooled**
+   connection string (hostname contains `-pooler`) and `SESSION_SECRET` (a
+   long random string — don't reuse the dev one in this repo). `DIRECT_URL`
+   only needs to exist in your local `.env`, not in Vercel — it's used by
+   `prisma migrate`/`prisma studio`, which you run from your own machine.
+4. Run `npx prisma migrate deploy` once with `DIRECT_URL` pointed at
+   production to create the tables, then optionally `npm run seed` for demo
+   data.
 5. Deploy. Vercel runs `npm install` (which triggers `postinstall: prisma
    generate`) then `npm run build` automatically.

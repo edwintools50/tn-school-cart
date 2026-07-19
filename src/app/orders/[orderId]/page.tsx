@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { whatsappLink } from "@/lib/whatsapp";
+import RazorpayPayButton from "@/components/RazorpayPayButton";
 
 const statusColor: Record<string, string> = {
   PLACED: "bg-blue-100 text-blue-700",
@@ -81,6 +82,21 @@ export default async function OrderDetailPage({
           <span>&#8377;{order.totalAmount.toFixed(2)}</span>
         </div>
       </div>
+
+      {!order.paid && order.razorpayOrderId && process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID && (
+        <div className="card p-4 mb-6">
+          <h2 className="font-semibold mb-3">Complete payment</h2>
+          <RazorpayPayButton
+            orderId={order.id}
+            razorpayOrderId={order.razorpayOrderId}
+            razorpayKeyId={process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID}
+            amount={order.totalAmount}
+            buyerName={user.name}
+            buyerEmail={user.email}
+            buyerPhone={user.phone}
+          />
+        </div>
+      )}
     </div>
   );
 }

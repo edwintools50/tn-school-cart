@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { notifyNewOrder, notifyOrderPlaced } from "@/lib/whatsapp-notify";
+import { createRazorpayOrder, isRazorpayConfigured } from "@/lib/razorpay";
 
 export async function addToCartAction(formData: FormData) {
   const user = await requireUser(["PRINCIPAL"]);
@@ -61,7 +63,7 @@ export async function placeOrderAction(formData: FormData) {
 
   const cartItems = await db.cartItem.findMany({
     where: { buyerId: user.id },
-    include: { product: true },
+    include: { product: { include: { supplier: true } } },
   });
   if (cartItems.length === 0) {
     throw new Error("Your cart is empty.");
@@ -81,6 +83,12 @@ export async function placeOrderAction(formData: FormData) {
     0
   );
 
+  // Payment is only "simulated" (marked paid immediately) when Razorpay isn't
+  // configured, so the site keeps working end-to-end before you've set up
+  // real payment credentials. Once configured, the order is created unpaid
+  // and the buyer completes a real Razorpay payment on the order page.
+  const razorpayReady = isRazorpayConfigured();
+
   const order = await db.$transaction(async (tx) => {
     const created = await tx.order.create({
       data: {
@@ -89,7 +97,7 @@ export async function placeOrderAction(formData: FormData) {
         shippingSchool,
         shippingDistrict,
         shippingAddress,
-        paid: true,
+        paid: !razorpayReady,
         items: {
           create: cartItems.map((item) => ({
             productId: item.productId,
@@ -113,6 +121,31 @@ export async function placeOrderAction(formData: FormData) {
 
     return created;
   });
+
+  if (razorpayReady) {
+    const razorpayOrderId = await createRazorpayOrder(totalAmount, order.id);
+    await db.order.update({ where: { id: order.id }, data: { razorpayOrderId } });
+  } else {
+    const orderShortId = order.id.slice(-8);
+
+    await notifyOrderPlaced({
+      phone: user.phone,
+      buyerName: user.name,
+      orderShortId,
+      totalAmount,
+    });
+
+    for (const item of cartItems) {
+      await notifyNewOrder({
+        phone: item.product.supplier.phone,
+        supplierName: item.product.supplier.businessName ?? item.product.supplier.name,
+        quantity: item.quantity,
+        itemTitle: item.product.title,
+        schoolName: shippingSchool,
+        orderShortId,
+      });
+    }
+  }
 
   revalidatePath("/orders");
   redirect(`/orders/${order.id}`);
