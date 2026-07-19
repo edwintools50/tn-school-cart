@@ -1,0 +1,120 @@
+import Link from "next/link";
+import Image from "next/image";
+import { getCurrentUser } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { logoutAction } from "@/app/(auth)/actions";
+
+const linkClass =
+  "text-sm font-medium text-foreground/80 hover:text-brand transition-colors";
+
+export default async function Nav() {
+  const user = await getCurrentUser();
+
+  let cartCount = 0;
+  if (user?.role === "PRINCIPAL") {
+    const items = await db.cartItem.aggregate({
+      where: { buyerId: user.id },
+      _sum: { quantity: true },
+    });
+    cartCount = items._sum.quantity ?? 0;
+  }
+
+  return (
+    <header className="border-b border-border bg-surface sticky top-0 z-20">
+      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-4">
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <Image src="/logo.svg" alt="TN School Cart" width={36} height={36} />
+          <span className="font-bold text-lg leading-tight">
+            <span className="text-brand">TN </span>
+            <span className="text-[#d43a2f]">School </span>
+            <span className="text-accent">Cart</span>
+          </span>
+        </Link>
+
+        <nav className="flex items-center gap-5 flex-wrap justify-end">
+          <Link href="/marketplace" className={linkClass}>
+            Marketplace
+          </Link>
+          <Link href="/services" className={linkClass}>
+            Find Services
+          </Link>
+          <Link href="/gigs" className={linkClass}>
+            Gig Requests
+          </Link>
+
+          {!user && (
+            <>
+              <Link href="/login" className={linkClass}>
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="text-sm font-semibold bg-brand text-white px-3 py-1.5 rounded-md hover:bg-brand-dark transition-colors"
+              >
+                Sign up
+              </Link>
+            </>
+          )}
+
+          {user?.role === "PRINCIPAL" && (
+            <>
+              <Link href="/gigs/mine" className={linkClass}>
+                My Gig Requests
+              </Link>
+              <Link href="/orders" className={linkClass}>
+                My Orders
+              </Link>
+              <Link href="/cart" className={`${linkClass} relative`}>
+                Cart
+                {cartCount > 0 && (
+                  <span className="ml-1 inline-flex items-center justify-center bg-accent text-white text-xs rounded-full h-5 min-w-5 px-1">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            </>
+          )}
+
+          {user?.role === "SUPPLIER" && (
+            <Link href="/dashboard/supplier" className={linkClass}>
+              Supplier Dashboard
+            </Link>
+          )}
+
+          {user?.role === "WORKER" && (
+            <Link href="/dashboard/worker" className={linkClass}>
+              Worker Dashboard
+            </Link>
+          )}
+
+          {user?.role === "ADMIN" && (
+            <Link href="/admin" className={linkClass}>
+              Admin
+            </Link>
+          )}
+
+          {user && (
+            <div className="flex items-center gap-3 pl-3 border-l border-border">
+              <span className="text-sm text-foreground/60 hidden sm:inline">
+                {user.name}
+                {user.status !== "APPROVED" && (
+                  <span className="ml-1 text-xs font-semibold text-amber-600">
+                    ({user.status.toLowerCase()})
+                  </span>
+                )}
+              </span>
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  className="text-sm font-medium text-foreground/60 hover:text-red-600 transition-colors"
+                >
+                  Log out
+                </button>
+              </form>
+            </div>
+          )}
+        </nav>
+      </div>
+    </header>
+  );
+}

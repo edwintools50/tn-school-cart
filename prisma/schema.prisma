@@ -1,0 +1,225 @@
+// TN School Cart data model
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PRINCIPAL
+  SUPPLIER
+  WORKER
+  ADMIN
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum ProductCategory {
+  STATIONERY
+  FURNITURE
+  EDUCATIONAL_CONTENT
+  NOTEBOOKS
+  HEALTH_HYGIENE
+  SPORTS
+  IT_ELECTRONICS
+  EXAM_PRINT_STATIONERY
+  UNIFORM_MERCHANDISE
+  OTHER
+}
+
+enum GigCategory {
+  PLUMBING
+  ELECTRICAL
+  TOILET_CLEANING
+  GENERAL_CLEANING
+  CARPENTRY
+  PAINTING
+  PEST_CONTROL
+  GARDENING
+  IT_SUPPORT
+  RO_WATER_SERVICE
+  SMART_BOARD_CCTV
+  PRINTING_SERVICES
+  CATERING
+  STUDENT_STAFF_TRANSPORT
+  GOODS_TRANSPORT
+  OTHER
+}
+
+enum ProductStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DELISTED
+}
+
+enum OrderStatus {
+  PLACED
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum GigRequestStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum GigOfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+model User {
+  id             String         @id @default(cuid())
+  name           String
+  email          String         @unique
+  passwordHash   String
+  phone          String
+  role           Role
+  status         ApprovalStatus @default(PENDING)
+  // Principal fields
+  schoolName     String?
+  district       String?
+  // Supplier / Worker fields
+  businessName   String?
+  serviceArea    String?
+  rejectionNote  String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  products       Product[]
+  cartItems      CartItem[]
+  orders         Order[]        @relation("BuyerOrders")
+  orderItems     OrderItem[]    @relation("SupplierOrderItems")
+  gigServices    GigService[]
+  gigRequests    GigRequest[]   @relation("PrincipalGigRequests")
+  gigOffers      GigOffer[]     @relation("WorkerGigOffers")
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  supplierId  String
+  supplier    User            @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  category    ProductCategory
+  price       Float
+  unit        String          @default("piece")
+  stock       Int             @default(0)
+  imageUrl    String?
+  status      ProductStatus   @default(PENDING)
+  rejectionNote String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@index([category])
+  @@index([status])
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  buyerId   String
+  buyer     User     @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  @@unique([buyerId, productId])
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  buyerId     String
+  buyer       User        @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  totalAmount Float
+  shippingSchool String
+  shippingDistrict String
+  shippingAddress String
+  paid        Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id           String      @id @default(cuid())
+  orderId      String
+  order        Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product     @relation(fields: [productId], references: [id])
+  supplierId   String
+  supplier     User        @relation("SupplierOrderItems", fields: [supplierId], references: [id])
+  titleAtOrder String
+  priceAtOrder Float
+  quantity     Int
+  status       OrderStatus @default(PLACED)
+}
+
+model GigService {
+  id            String        @id @default(cuid())
+  workerId      String
+  worker        User          @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  category      GigCategory
+  title         String
+  description   String
+  priceType     String        @default("QUOTE") // FIXED | HOURLY | QUOTE
+  price         Float?
+  serviceArea   String
+  status        ProductStatus @default(PENDING)
+  rejectionNote String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model GigRequest {
+  id            String            @id @default(cuid())
+  principalId   String
+  principal     User              @relation("PrincipalGigRequests", fields: [principalId], references: [id], onDelete: Cascade)
+  category      GigCategory
+  title         String
+  description   String
+  schoolName    String
+  district      String
+  address       String
+  preferredDate DateTime?
+  budget        Float?
+  status        GigRequestStatus  @default(OPEN)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  offers        GigOffer[]
+}
+
+model GigOffer {
+  id           String         @id @default(cuid())
+  gigRequestId String
+  gigRequest   GigRequest     @relation(fields: [gigRequestId], references: [id], onDelete: Cascade)
+  workerId     String
+  worker       User           @relation("WorkerGigOffers", fields: [workerId], references: [id], onDelete: Cascade)
+  quotedPrice  Float
+  message      String
+  status       GigOfferStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+
+  @@unique([gigRequestId, workerId])
+}
