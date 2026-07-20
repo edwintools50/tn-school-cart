@@ -22,6 +22,7 @@ async function upsertUser(data: {
   role: "PRINCIPAL" | "SUPPLIER" | "WORKER" | "ADMIN";
   status?: "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
   schoolName?: string;
+  udiseNumber?: string;
   district?: string;
   businessName?: string;
   serviceArea?: string;
@@ -38,6 +39,7 @@ async function upsertUser(data: {
       role: data.role,
       status: data.status ?? "APPROVED",
       schoolName: data.schoolName,
+      udiseNumber: data.udiseNumber,
       district: data.district,
       businessName: data.businessName,
       serviceArea: data.serviceArea,
@@ -145,6 +147,7 @@ async function main() {
     phone: "9840033332",
     role: "PRINCIPAL",
     schoolName: "Government Higher Secondary School, Anna Nagar",
+    udiseNumber: "33070100601",
     district: "Madurai",
   });
 

@@ -95,6 +95,7 @@ model User {
   status         ApprovalStatus @default(PENDING)
   // Principal fields
   schoolName     String?
+  udiseNumber    String?
   district       String?
   // Supplier / Worker fields
   businessName   String?
@@ -153,7 +154,11 @@ model Order {
   buyer       User        @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
   totalAmount Float
   shippingSchool String
+  shippingUdise String?
   shippingDistrict String
+  shippingTaluk String?
+  shippingBlock String?
+  shippingPinCode String?
   shippingAddress String
   paid        Boolean     @default(false)
   razorpayOrderId   String? @unique
@@ -201,7 +206,11 @@ model GigRequest {
   title         String
   description   String
   schoolName    String
+  udiseNumber   String?
   district      String
+  taluk         String?
+  block         String?
+  pinCode       String?
   address       String
   preferredDate DateTime?
   budget        Float?

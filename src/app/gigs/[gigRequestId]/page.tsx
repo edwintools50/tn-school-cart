@@ -96,11 +96,19 @@ export default async function GigRequestDetailPage({
         </div>
       </div>
 
+      <p className="text-sm text-foreground/60 mb-1">
+        {gigRequest.schoolName}
+        {gigRequest.udiseNumber ? ` (UDISE: ${gigRequest.udiseNumber})` : ""} &middot;{" "}
+        {gigRequest.address}
+        {gigRequest.block ? `, ${gigRequest.block}` : ""}
+        {gigRequest.taluk ? `, ${gigRequest.taluk}` : ""}, {gigRequest.district} District
+        {gigRequest.pinCode ? ` - ${gigRequest.pinCode}` : ""}
+      </p>
       <p className="text-sm text-foreground/60 mb-6">
-        {gigRequest.schoolName} &middot; {gigRequest.address}, {gigRequest.district} District
-        {gigRequest.budget ? ` · Budget ₹${gigRequest.budget.toFixed(0)}` : ""}
+        {gigRequest.budget ? `Budget ₹${gigRequest.budget.toFixed(0)}` : ""}
+        {gigRequest.budget && gigRequest.preferredDate ? " · " : ""}
         {gigRequest.preferredDate
-          ? ` · Preferred ${new Date(gigRequest.preferredDate).toLocaleDateString("en-IN")}`
+          ? `Preferred ${new Date(gigRequest.preferredDate).toLocaleDateString("en-IN")}`
           : ""}
       </p>
 

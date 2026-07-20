@@ -15,7 +15,14 @@ const gigRequestSchema = z.object({
   title: z.string().trim().min(3, "Title is required"),
   description: z.string().trim().min(10, "Please describe the work needed"),
   schoolName: z.string().trim().min(2, "School name is required"),
+  udiseNumber: z
+    .string()
+    .trim()
+    .regex(/^\d{11}$/, "UDISE number must be the 11-digit school code"),
   district: z.string().trim().min(2, "District is required"),
+  taluk: z.string().trim().min(2, "Taluk is required"),
+  block: z.string().trim().min(2, "Block is required"),
+  pinCode: z.string().trim().regex(/^\d{6}$/, "Enter a valid 6-digit pin code"),
   address: z.string().trim().min(5, "Address is required"),
   preferredDate: z.string().trim().optional(),
   budget: z.preprocess(
@@ -43,7 +50,11 @@ export async function createGigRequestAction(
       title: data.title,
       description: data.description,
       schoolName: data.schoolName,
+      udiseNumber: data.udiseNumber,
       district: data.district,
+      taluk: data.taluk,
+      block: data.block,
+      pinCode: data.pinCode,
       address: data.address,
       preferredDate: data.preferredDate ? new Date(data.preferredDate) : null,
       budget: data.budget ?? null,

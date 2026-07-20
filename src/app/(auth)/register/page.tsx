@@ -80,12 +80,29 @@ export default function RegisterPage() {
           </div>
 
           {role === "PRINCIPAL" && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass} htmlFor="schoolName">
-                  School name
-                </label>
-                <input id="schoolName" name="schoolName" required className={inputClass} />
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass} htmlFor="schoolName">
+                    School name
+                  </label>
+                  <input id="schoolName" name="schoolName" required className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass} htmlFor="udiseNumber">
+                    UDISE number
+                  </label>
+                  <input
+                    id="udiseNumber"
+                    name="udiseNumber"
+                    inputMode="numeric"
+                    pattern="\d{11}"
+                    maxLength={11}
+                    placeholder="11-digit code"
+                    required
+                    className={inputClass}
+                  />
+                </div>
               </div>
               <div>
                 <label className={labelClass} htmlFor="district">
@@ -100,7 +117,7 @@ export default function RegisterPage() {
                   ))}
                 </select>
               </div>
-            </div>
+            </>
           )}
 
           {(role === "SUPPLIER" || role === "WORKER") && (

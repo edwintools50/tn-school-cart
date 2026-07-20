@@ -51,8 +51,16 @@ export default async function OrderDetailPage({
       <div className="card p-4 mb-6">
         <h2 className="font-semibold mb-2">Delivery to</h2>
         <p className="text-sm">{order.shippingSchool}</p>
+        {order.shippingUdise && (
+          <p className="text-xs text-foreground/50">UDISE: {order.shippingUdise}</p>
+        )}
         <p className="text-sm text-foreground/60">{order.shippingAddress}</p>
-        <p className="text-sm text-foreground/60">{order.shippingDistrict} District, Tamil Nadu</p>
+        <p className="text-sm text-foreground/60">
+          {[order.shippingBlock, order.shippingTaluk].filter(Boolean).join(", ")}
+          {order.shippingBlock || order.shippingTaluk ? ", " : ""}
+          {order.shippingDistrict} District, Tamil Nadu
+          {order.shippingPinCode ? ` - ${order.shippingPinCode}` : ""}
+        </p>
       </div>
 
       <div className="card divide-y divide-border mb-6">

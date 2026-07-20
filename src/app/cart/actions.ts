@@ -54,11 +54,27 @@ export async function placeOrderAction(formData: FormData) {
   const user = await requireUser(["PRINCIPAL"]);
 
   const shippingSchool = String(formData.get("shippingSchool") ?? "").trim();
+  const shippingUdise = String(formData.get("shippingUdise") ?? "").trim();
   const shippingDistrict = String(formData.get("shippingDistrict") ?? "").trim();
+  const shippingTaluk = String(formData.get("shippingTaluk") ?? "").trim();
+  const shippingBlock = String(formData.get("shippingBlock") ?? "").trim();
+  const shippingPinCode = String(formData.get("shippingPinCode") ?? "").trim();
   const shippingAddress = String(formData.get("shippingAddress") ?? "").trim();
 
-  if (!shippingSchool || !shippingDistrict || !shippingAddress) {
+  if (
+    !shippingSchool ||
+    !shippingDistrict ||
+    !shippingAddress ||
+    !shippingTaluk ||
+    !shippingBlock
+  ) {
     throw new Error("Please fill in all delivery details.");
+  }
+  if (!/^\d{11}$/.test(shippingUdise)) {
+    throw new Error("Enter a valid 11-digit UDISE number.");
+  }
+  if (!/^\d{6}$/.test(shippingPinCode)) {
+    throw new Error("Enter a valid 6-digit pin code.");
   }
 
   const cartItems = await db.cartItem.findMany({
@@ -95,7 +111,11 @@ export async function placeOrderAction(formData: FormData) {
         buyerId: user.id,
         totalAmount,
         shippingSchool,
+        shippingUdise,
         shippingDistrict,
+        shippingTaluk,
+        shippingBlock,
+        shippingPinCode,
         shippingAddress,
         paid: !razorpayReady,
         items: {

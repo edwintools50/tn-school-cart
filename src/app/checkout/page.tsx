@@ -24,17 +24,35 @@ export default async function CheckoutPage() {
       <div className="grid sm:grid-cols-2 gap-8">
         <form action={placeOrderAction} className="space-y-4">
           <h2 className="font-semibold">Delivery details</h2>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="shippingSchool">
-              School name
-            </label>
-            <input
-              id="shippingSchool"
-              name="shippingSchool"
-              defaultValue={user.schoolName ?? ""}
-              required
-              className="w-full rounded-md border border-border px-3 py-2 text-sm"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="shippingSchool">
+                School name
+              </label>
+              <input
+                id="shippingSchool"
+                name="shippingSchool"
+                defaultValue={user.schoolName ?? ""}
+                required
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="shippingUdise">
+                UDISE number
+              </label>
+              <input
+                id="shippingUdise"
+                name="shippingUdise"
+                inputMode="numeric"
+                pattern="\d{11}"
+                maxLength={11}
+                placeholder="11-digit code"
+                defaultValue={user.udiseNumber ?? ""}
+                required
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="shippingDistrict">
@@ -54,6 +72,44 @@ export default async function CheckoutPage() {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="shippingTaluk">
+                Taluk
+              </label>
+              <input
+                id="shippingTaluk"
+                name="shippingTaluk"
+                required
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="shippingBlock">
+                Block
+              </label>
+              <input
+                id="shippingBlock"
+                name="shippingBlock"
+                required
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="shippingPinCode">
+                Pin code
+              </label>
+              <input
+                id="shippingPinCode"
+                name="shippingPinCode"
+                inputMode="numeric"
+                pattern="\d{6}"
+                maxLength={6}
+                required
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="shippingAddress">

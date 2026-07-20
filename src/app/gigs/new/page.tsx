@@ -6,7 +6,7 @@ export default async function NewGigRequestPage({
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
-  await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(["PRINCIPAL"]);
   const { category } = await searchParams;
 
   return (
@@ -16,7 +16,7 @@ export default async function NewGigRequestPage({
         Describe the job and gig workers in your area will send you offers.
       </p>
       <div className="card p-6">
-        <GigRequestForm defaultCategory={category} />
+        <GigRequestForm defaultCategory={category} defaultUdiseNumber={user.udiseNumber ?? undefined} />
       </div>
     </div>
   );

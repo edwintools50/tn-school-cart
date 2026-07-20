@@ -8,7 +8,13 @@ const inputClass =
   "w-full rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand";
 const labelClass = "block text-sm font-medium mb-1";
 
-export default function GigRequestForm({ defaultCategory }: { defaultCategory?: string }) {
+export default function GigRequestForm({
+  defaultCategory,
+  defaultUdiseNumber,
+}: {
+  defaultCategory?: string;
+  defaultUdiseNumber?: string;
+}) {
   const [state, formAction, pending] = useActionState(createGigRequestAction, undefined);
 
   return (
@@ -70,17 +76,63 @@ export default function GigRequestForm({ defaultCategory }: { defaultCategory?: 
           <input id="schoolName" name="schoolName" required className={inputClass} />
         </div>
         <div>
-          <label className={labelClass} htmlFor="district">
-            District
+          <label className={labelClass} htmlFor="udiseNumber">
+            UDISE number
           </label>
-          <select id="district" name="district" required defaultValue="" className={inputClass}>
-            <option value="">Select district</option>
-            {TN_DISTRICTS.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
+          <input
+            id="udiseNumber"
+            name="udiseNumber"
+            inputMode="numeric"
+            pattern="\d{11}"
+            maxLength={11}
+            placeholder="11-digit code"
+            defaultValue={defaultUdiseNumber ?? ""}
+            required
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelClass} htmlFor="district">
+          District
+        </label>
+        <select id="district" name="district" required defaultValue="" className={inputClass}>
+          <option value="">Select district</option>
+          {TN_DISTRICTS.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className={labelClass} htmlFor="taluk">
+            Taluk
+          </label>
+          <input id="taluk" name="taluk" required className={inputClass} />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="block">
+            Block
+          </label>
+          <input id="block" name="block" required className={inputClass} />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="pinCode">
+            Pin code
+          </label>
+          <input
+            id="pinCode"
+            name="pinCode"
+            inputMode="numeric"
+            pattern="\d{6}"
+            maxLength={6}
+            required
+            className={inputClass}
+          />
         </div>
       </div>
 

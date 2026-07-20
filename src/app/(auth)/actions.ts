@@ -21,6 +21,10 @@ const registerSchema = z.discriminatedUnion("role", [
     role: z.literal(Role.PRINCIPAL),
     ...baseSchema,
     schoolName: z.string().trim().min(2, "School name is required"),
+    udiseNumber: z
+      .string()
+      .trim()
+      .regex(/^\d{11}$/, "UDISE number must be the 11-digit school code"),
     district: z.string().trim().min(2, "District is required"),
   }),
   z.object({
@@ -71,6 +75,7 @@ export async function registerAction(
       role: data.role,
       status: data.role === Role.PRINCIPAL ? "APPROVED" : "PENDING",
       schoolName: data.role === Role.PRINCIPAL ? data.schoolName : undefined,
+      udiseNumber: data.role === Role.PRINCIPAL ? data.udiseNumber : undefined,
       district: data.role === Role.PRINCIPAL ? data.district : undefined,
       businessName:
         data.role === Role.SUPPLIER || data.role === Role.WORKER
