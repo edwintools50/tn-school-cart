@@ -19,7 +19,7 @@ function normalizePhone(raw: string): string | null {
 type TemplateName =
   | "order_placed"
   | "order_status_update"
-  | "new_order_alert"
+  | "new_order_alert_v2"
   | "gig_offer_received"
   | "gig_assigned"
   | "gig_status_update";
@@ -123,7 +123,7 @@ export async function notifyNewOrder(params: {
   schoolName: string;
   orderShortId: string;
 }) {
-  await sendTemplate(params.phone, "new_order_alert", [
+  await sendTemplate(params.phone, "new_order_alert_v2", [
     params.supplierName,
     String(params.quantity),
     params.itemTitle,
