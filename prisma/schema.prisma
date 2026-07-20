@@ -102,6 +102,8 @@ model User {
   serviceArea    String?
   rejectionNote  String?
   verificationPhotoUrl String?
+  resetTokenHash      String?   @unique
+  resetTokenExpiresAt DateTime?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 

@@ -104,13 +104,6 @@ export default function Home() {
             ))}
         </div>
       </section>
-
-      <footer className="border-t border-border mt-8">
-        <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-foreground/60 flex flex-col sm:flex-row justify-between gap-2">
-          <span>&copy; {new Date().getFullYear()} TN School Cart</span>
-          <span>Serving schools across all 38 districts of Tamil Nadu</span>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import crypto from "crypto";
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -7,6 +8,13 @@ import { hashPassword, verifyPassword } from "@/lib/auth";
 import { createSession, destroySession } from "@/lib/session";
 import { Role } from "@/generated/prisma/enums";
 import { uploadPhoto } from "@/lib/blob";
+import { sendPasswordResetEmail } from "@/lib/email";
+
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
+
+function hashResetToken(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
 
 export type ActionState = { error?: string } | undefined;
 
@@ -135,4 +143,72 @@ export async function loginAction(
 export async function logoutAction() {
   await destroySession();
   redirect("/");
+}
+
+const requestResetSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Enter a valid email"),
+});
+
+export type RequestResetState = { error?: string; success?: boolean } | undefined;
+
+export async function requestPasswordResetAction(
+  _prevState: RequestResetState,
+  formData: FormData
+): Promise<RequestResetState> {
+  const parsed = requestResetSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const user = await db.user.findUnique({ where: { email: parsed.data.email } });
+  if (user) {
+    const token = crypto.randomBytes(32).toString("hex");
+    await db.user.update({
+      where: { id: user.id },
+      data: {
+        resetTokenHash: hashResetToken(token),
+        resetTokenExpiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+      },
+    });
+
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tnschoolcart.com";
+    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+
+    try {
+      await sendPasswordResetEmail(user.email, resetUrl);
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Failed to send reset email." };
+    }
+  }
+
+  return { success: true };
+}
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Reset link is invalid."),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export async function resetPasswordAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const parsed = resetPasswordSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const tokenHash = hashResetToken(parsed.data.token);
+  const user = await db.user.findUnique({ where: { resetTokenHash: tokenHash } });
+  if (!user || !user.resetTokenExpiresAt || user.resetTokenExpiresAt < new Date()) {
+    return { error: "This reset link is invalid or has expired. Request a new one." };
+  }
+
+  const passwordHash = await hashPassword(parsed.data.password);
+  await db.user.update({
+    where: { id: user.id },
+    data: { passwordHash, resetTokenHash: null, resetTokenExpiresAt: null },
+  });
+
+  redirect("/login");
 }
