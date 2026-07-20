@@ -101,6 +101,7 @@ model User {
   businessName   String?
   serviceArea    String?
   rejectionNote  String?
+  verificationPhotoUrl String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
@@ -212,6 +213,8 @@ model GigRequest {
   block         String?
   pinCode       String?
   address       String
+  photoUrl      String?
+  completionPhotoUrl String?
   preferredDate DateTime?
   budget        Float?
   status        GigRequestStatus  @default(OPEN)

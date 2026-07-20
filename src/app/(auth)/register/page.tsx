@@ -117,6 +117,21 @@ export default function RegisterPage() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className={labelClass} htmlFor="schoolPhoto">
+                  School photo (signboard/building, optional)
+                </label>
+                <input
+                  id="schoolPhoto"
+                  name="schoolPhoto"
+                  type="file"
+                  accept="image/*"
+                  className={inputClass}
+                />
+                <p className="text-xs text-foreground/50 mt-1">
+                  Helps our admin team verify your school faster.
+                </p>
+              </div>
             </>
           )}
 

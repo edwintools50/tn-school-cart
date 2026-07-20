@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ProductCategory, OrderStatus } from "@/generated/prisma/enums";
 import { notifyOrderStatusUpdate } from "@/lib/whatsapp-notify";
+import { uploadPhoto } from "@/lib/blob";
 
 export type ActionState = { error?: string } | undefined;
 
@@ -17,7 +18,6 @@ const productSchema = z.object({
   price: z.coerce.number().positive("Price must be greater than 0"),
   unit: z.string().trim().min(1).default("piece"),
   stock: z.coerce.number().int().min(0, "Stock can't be negative"),
-  imageUrl: z.string().trim().url("Enter a valid image URL").optional().or(z.literal("")),
 });
 
 export async function createProductAction(
@@ -30,10 +30,17 @@ export async function createProductAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
+  let imageUrl: string | undefined;
+  try {
+    imageUrl = await uploadPhoto(formData.get("imagePhoto") as File | null, "products");
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Photo upload failed." };
+  }
+
   await db.product.create({
     data: {
       ...parsed.data,
-      imageUrl: parsed.data.imageUrl || null,
+      imageUrl: imageUrl ?? null,
       supplierId: user.id,
       status: "PENDING",
     },
@@ -60,11 +67,18 @@ export async function updateProductAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
+  let imageUrl: string | undefined;
+  try {
+    imageUrl = await uploadPhoto(formData.get("imagePhoto") as File | null, "products");
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Photo upload failed." };
+  }
+
   await db.product.update({
     where: { id: productId },
     data: {
       ...parsed.data,
-      imageUrl: parsed.data.imageUrl || null,
+      ...(imageUrl ? { imageUrl } : {}),
       status: "PENDING",
       rejectionNote: null,
     },

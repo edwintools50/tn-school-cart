@@ -61,19 +61,30 @@ export default async function AdminUsersPage({
         <div className="space-y-3">
           {users.map((u) => (
             <div key={u.id} className="card p-4 flex items-center justify-between gap-4 flex-wrap">
-              <div>
-                <p className="font-semibold">
-                  {u.name} <span className="text-xs font-normal text-foreground/50">({ROLE_LABELS[u.role]})</span>
-                </p>
-                <p className="text-xs text-foreground/50">
-                  {u.email} &middot; {u.phone}
-                </p>
-                <p className="text-xs text-foreground/50">
-                  {u.role === "PRINCIPAL" ? `${u.schoolName}, ${u.district}` : `${u.businessName}, ${u.serviceArea}`}
-                </p>
-                {u.status === "REJECTED" && u.rejectionNote && (
-                  <p className="text-xs text-red-600 mt-1">Reason: {u.rejectionNote}</p>
+              <div className="flex items-center gap-3">
+                {u.verificationPhotoUrl && (
+                  <a href={u.verificationPhotoUrl} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={u.verificationPhotoUrl}
+                      alt="School verification photo"
+                      className="h-14 w-14 object-cover rounded-md border border-border"
+                    />
+                  </a>
                 )}
+                <div>
+                  <p className="font-semibold">
+                    {u.name} <span className="text-xs font-normal text-foreground/50">({ROLE_LABELS[u.role]})</span>
+                  </p>
+                  <p className="text-xs text-foreground/50">
+                    {u.email} &middot; {u.phone}
+                  </p>
+                  <p className="text-xs text-foreground/50">
+                    {u.role === "PRINCIPAL" ? `${u.schoolName}, ${u.district}` : `${u.businessName}, ${u.serviceArea}`}
+                  </p>
+                  {u.status === "REJECTED" && u.rejectionNote && (
+                    <p className="text-xs text-red-600 mt-1">Reason: {u.rejectionNote}</p>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColor[u.status]}`}>

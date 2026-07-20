@@ -47,13 +47,24 @@ export default async function AdminProductsPage({
         <div className="space-y-3">
           {products.map((p) => (
             <div key={p.id} className="card p-4 flex items-center justify-between gap-4 flex-wrap">
-              <div>
-                <p className="font-semibold">{p.title}</p>
-                <p className="text-xs text-foreground/50">
-                  {PRODUCT_CATEGORY_LABELS[p.category]} &middot; &#8377;{p.price.toFixed(2)} / {p.unit} &middot;{" "}
-                  by {p.supplier.businessName ?? p.supplier.name}
-                </p>
-                <p className="text-xs text-foreground/60 mt-1 max-w-xl">{p.description}</p>
+              <div className="flex items-center gap-3">
+                {p.imageUrl && (
+                  <a href={p.imageUrl} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={p.imageUrl}
+                      alt={p.title}
+                      className="h-14 w-14 object-cover rounded-md border border-border"
+                    />
+                  </a>
+                )}
+                <div>
+                  <p className="font-semibold">{p.title}</p>
+                  <p className="text-xs text-foreground/50">
+                    {PRODUCT_CATEGORY_LABELS[p.category]} &middot; &#8377;{p.price.toFixed(2)} / {p.unit} &middot;{" "}
+                    by {p.supplier.businessName ?? p.supplier.name}
+                  </p>
+                  <p className="text-xs text-foreground/60 mt-1 max-w-xl">{p.description}</p>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColor[p.status]}`}>

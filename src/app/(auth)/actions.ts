@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { createSession, destroySession } from "@/lib/session";
 import { Role } from "@/generated/prisma/enums";
+import { uploadPhoto } from "@/lib/blob";
 
 export type ActionState = { error?: string } | undefined;
 
@@ -66,6 +67,16 @@ export async function registerAction(
 
   const passwordHash = await hashPassword(data.password);
 
+  let verificationPhotoUrl: string | undefined;
+  if (data.role === Role.PRINCIPAL) {
+    const schoolPhoto = formData.get("schoolPhoto") as File | null;
+    try {
+      verificationPhotoUrl = await uploadPhoto(schoolPhoto, "school-verification");
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Photo upload failed." };
+    }
+  }
+
   const user = await db.user.create({
     data: {
       name: data.name,
@@ -77,6 +88,7 @@ export async function registerAction(
       schoolName: data.role === Role.PRINCIPAL ? data.schoolName : undefined,
       udiseNumber: data.role === Role.PRINCIPAL ? data.udiseNumber : undefined,
       district: data.role === Role.PRINCIPAL ? data.district : undefined,
+      verificationPhotoUrl,
       businessName:
         data.role === Role.SUPPLIER || data.role === Role.WORKER
           ? data.businessName

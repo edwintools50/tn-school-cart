@@ -143,6 +143,13 @@ export default function GigRequestForm({
         <input id="address" name="address" required className={inputClass} />
       </div>
 
+      <div>
+        <label className={labelClass} htmlFor="photo">
+          Photo of the issue/job (optional)
+        </label>
+        <input id="photo" name="photo" type="file" accept="image/*" className={inputClass} />
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelClass} htmlFor="preferredDate">

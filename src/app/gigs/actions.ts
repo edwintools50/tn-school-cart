@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { GigCategory, GigRequestStatus } from "@/generated/prisma/enums";
 import { notifyGigAssigned, notifyGigOfferReceived, notifyGigStatusUpdate } from "@/lib/whatsapp-notify";
+import { uploadPhoto } from "@/lib/blob";
 
 export type ActionState = { error?: string } | undefined;
 
@@ -43,6 +44,13 @@ export async function createGigRequestAction(
   }
   const data = parsed.data;
 
+  let photoUrl: string | undefined;
+  try {
+    photoUrl = await uploadPhoto(formData.get("photo") as File | null, "gig-requests");
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Photo upload failed." };
+  }
+
   const gigRequest = await db.gigRequest.create({
     data: {
       principalId: user.id,
@@ -56,6 +64,7 @@ export async function createGigRequestAction(
       block: data.block,
       pinCode: data.pinCode,
       address: data.address,
+      photoUrl,
       preferredDate: data.preferredDate ? new Date(data.preferredDate) : null,
       budget: data.budget ?? null,
     },
@@ -136,6 +145,31 @@ export async function acceptOfferAction(formData: FormData) {
   });
 
   revalidatePath(`/gigs/${offer.gigRequestId}`);
+}
+
+export async function submitCompletionPhotoAction(formData: FormData) {
+  const user = await requireUser(["WORKER"]);
+  const gigRequestId = String(formData.get("gigRequestId"));
+
+  const gigRequest = await db.gigRequest.findUnique({
+    where: { id: gigRequestId },
+    include: { offers: { where: { status: "ACCEPTED" } } },
+  });
+  if (!gigRequest) throw new Error("Gig request not found.");
+  const isAssignedWorker = gigRequest.offers[0]?.workerId === user.id;
+  if (!isAssignedWorker) throw new Error("You are not assigned to this job.");
+  if (!["ASSIGNED", "IN_PROGRESS"].includes(gigRequest.status)) {
+    throw new Error("This job is not in progress.");
+  }
+
+  const completionPhotoUrl = await uploadPhoto(formData.get("photo") as File | null, "gig-completions");
+  if (!completionPhotoUrl) {
+    throw new Error("Please choose a photo to upload.");
+  }
+
+  await db.gigRequest.update({ where: { id: gigRequestId }, data: { completionPhotoUrl } });
+
+  revalidatePath(`/gigs/${gigRequestId}`);
 }
 
 const requestStatusTransitions: Record<string, string[]> = {

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { GIG_CATEGORY_LABELS } from "@/lib/constants";
 import { whatsappLink } from "@/lib/whatsapp";
 import GigOfferForm from "@/components/GigOfferForm";
-import { acceptOfferAction, updateGigRequestStatusAction } from "../actions";
+import { acceptOfferAction, submitCompletionPhotoAction, updateGigRequestStatusAction } from "../actions";
 
 const statusColor: Record<string, string> = {
   OPEN: "bg-blue-100 text-blue-700",
@@ -115,7 +115,45 @@ export default async function GigRequestDetailPage({
       <div className="card p-4 mb-6">
         <h2 className="font-semibold mb-2 text-sm">Job description</h2>
         <p className="text-sm leading-relaxed">{gigRequest.description}</p>
+        {gigRequest.photoUrl && (
+          <a href={gigRequest.photoUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-3">
+            <img
+              src={gigRequest.photoUrl}
+              alt="Photo of the job"
+              className="h-32 w-32 object-cover rounded-md border border-border"
+            />
+          </a>
+        )}
       </div>
+
+      {isAssignedWorker && ["ASSIGNED", "IN_PROGRESS"].includes(gigRequest.status) && (
+        <div className="card p-4 mb-6">
+          <h2 className="font-semibold mb-2 text-sm">Submit proof of completion</h2>
+          <form action={submitCompletionPhotoAction} className="flex items-end gap-3 flex-wrap">
+            <input type="hidden" name="gigRequestId" value={gigRequest.id} />
+            <input type="file" name="photo" accept="image/*" required className="text-sm" />
+            <button
+              type="submit"
+              className="border border-border font-semibold rounded-md px-4 py-2 text-sm hover:border-brand"
+            >
+              Upload photo
+            </button>
+          </form>
+        </div>
+      )}
+
+      {gigRequest.completionPhotoUrl && (
+        <div className="card p-4 mb-6">
+          <h2 className="font-semibold mb-2 text-sm">Proof of completion</h2>
+          <a href={gigRequest.completionPhotoUrl} target="_blank" rel="noopener noreferrer">
+            <img
+              src={gigRequest.completionPhotoUrl}
+              alt="Proof of completed work"
+              className="h-32 w-32 object-cover rounded-md border border-border"
+            />
+          </a>
+        </div>
+      )}
 
       {isOwner && (
         <div className="mb-6 flex gap-3 flex-wrap">

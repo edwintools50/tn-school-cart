@@ -29,14 +29,38 @@ export default async function AdminGigsPage() {
         <div className="space-y-3">
           {gigRequests.map((gig) => (
             <div key={gig.id} className="card p-4 flex items-center justify-between gap-4 flex-wrap">
-              <div>
-                <span className="text-xs font-semibold text-accent uppercase tracking-wide">
-                  {GIG_CATEGORY_LABELS[gig.category]}
-                </span>
-                <p className="font-semibold">{gig.title}</p>
-                <p className="text-xs text-foreground/50">
-                  {gig.principal.name} &middot; {gig.schoolName} ({gig.district}) &middot; {gig._count.offers} offer(s)
-                </p>
+              <div className="flex items-center gap-3">
+                {(gig.photoUrl || gig.completionPhotoUrl) && (
+                  <div className="flex gap-1">
+                    {gig.photoUrl && (
+                      <a href={gig.photoUrl} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={gig.photoUrl}
+                          alt="Job photo"
+                          className="h-14 w-14 object-cover rounded-md border border-border"
+                        />
+                      </a>
+                    )}
+                    {gig.completionPhotoUrl && (
+                      <a href={gig.completionPhotoUrl} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={gig.completionPhotoUrl}
+                          alt="Completion proof"
+                          className="h-14 w-14 object-cover rounded-md border border-border"
+                        />
+                      </a>
+                    )}
+                  </div>
+                )}
+                <div>
+                  <span className="text-xs font-semibold text-accent uppercase tracking-wide">
+                    {GIG_CATEGORY_LABELS[gig.category]}
+                  </span>
+                  <p className="font-semibold">{gig.title}</p>
+                  <p className="text-xs text-foreground/50">
+                    {gig.principal.name} &middot; {gig.schoolName} ({gig.district}) &middot; {gig._count.offers} offer(s)
+                  </p>
+                </div>
               </div>
               <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColor[gig.status]}`}>
                 {gig.status.replace("_", " ")}

@@ -131,17 +131,28 @@ export default function ProductForm({
       </div>
 
       <div>
-        <label className={labelClass} htmlFor="imageUrl">
-          Image URL (optional)
+        <label className={labelClass} htmlFor="imagePhoto">
+          Product photo (optional)
         </label>
+        {defaultValues?.imageUrl && (
+          <img
+            src={defaultValues.imageUrl}
+            alt="Current product photo"
+            className="h-20 w-20 object-cover rounded-md border border-border mb-2"
+          />
+        )}
         <input
-          id="imageUrl"
-          name="imageUrl"
-          type="url"
-          placeholder="https://..."
-          defaultValue={defaultValues?.imageUrl ?? ""}
+          id="imagePhoto"
+          name="imagePhoto"
+          type="file"
+          accept="image/*"
           className={inputClass}
         />
+        {defaultValues?.imageUrl && (
+          <p className="text-xs text-foreground/50 mt-1">
+            Leave blank to keep the current photo.
+          </p>
+        )}
       </div>
 
       {state?.error && (
