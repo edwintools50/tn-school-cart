@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { placeOrderAction } from "@/app/cart/actions";
 import { TN_DISTRICTS } from "@/lib/constants";
+import { isRazorpayConfigured } from "@/lib/razorpay";
 
 export default async function CheckoutPage() {
   const user = await requireUser(["PRINCIPAL"]);
@@ -16,6 +17,7 @@ export default async function CheckoutPage() {
   if (cartItems.length === 0) redirect("/cart");
 
   const total = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const razorpayReady = isRazorpayConfigured();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 w-full">
@@ -124,10 +126,16 @@ export default async function CheckoutPage() {
             />
           </div>
 
-          <div className="bg-accent/10 border border-accent/30 rounded-md px-3 py-2 text-xs text-accent-dark">
-            Payment is simulated for this demo &mdash; your order will be marked
-            as paid immediately, no real payment is collected.
-          </div>
+          {razorpayReady ? (
+            <div className="bg-brand/10 border border-brand/30 rounded-md px-3 py-2 text-xs text-brand">
+              You&apos;ll complete a secure Razorpay payment on the next step.
+            </div>
+          ) : (
+            <div className="bg-accent/10 border border-accent/30 rounded-md px-3 py-2 text-xs text-accent-dark">
+              Payment is simulated for this demo &mdash; your order will be marked
+              as paid immediately, no real payment is collected.
+            </div>
+          )}
 
           <button
             type="submit"
