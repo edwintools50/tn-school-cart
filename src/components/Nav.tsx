@@ -41,6 +41,9 @@ export default async function Nav() {
           <Link href="/gigs" className={linkClass}>
             Gig Requests
           </Link>
+          <Link href="/jobs" className={linkClass}>
+            Job Vacancies
+          </Link>
 
           {!user && (
             <>
@@ -60,6 +63,9 @@ export default async function Nav() {
             <>
               <Link href="/gigs/mine" className={linkClass}>
                 My Gig Requests
+              </Link>
+              <Link href="/jobs/mine" className={linkClass}>
+                My Job Vacancies
               </Link>
               <Link href="/orders" className={linkClass}>
                 My Orders
@@ -84,6 +90,12 @@ export default async function Nav() {
           {user?.role === "WORKER" && (
             <Link href="/dashboard/worker" className={linkClass}>
               Worker Dashboard
+            </Link>
+          )}
+
+          {user?.role === "TEACHER" && (
+            <Link href="/dashboard/teacher" className={linkClass}>
+              Teacher Dashboard
             </Link>
           )}
 

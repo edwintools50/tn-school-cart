@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { ROLE_LABELS } from "@/lib/constants";
+import { ROLE_LABELS, TEACHING_SUBJECT_LABELS } from "@/lib/constants";
 import {
   approveUserAction,
   rejectUserAction,
@@ -27,7 +27,7 @@ export default async function AdminUsersPage({
     where: {
       role: { not: "ADMIN" },
       ...(status ? { status: status as "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED" } : {}),
-      ...(role ? { role: role as "PRINCIPAL" | "SUPPLIER" | "WORKER" } : {}),
+      ...(role ? { role: role as "PRINCIPAL" | "SUPPLIER" | "WORKER" | "TEACHER" } : {}),
     },
     orderBy: { createdAt: "desc" },
   });
@@ -49,6 +49,7 @@ export default async function AdminUsersPage({
           <option value="PRINCIPAL">Principal</option>
           <option value="SUPPLIER">Supplier</option>
           <option value="WORKER">Gig Worker</option>
+          <option value="TEACHER">Teacher</option>
         </select>
         <button type="submit" className="bg-brand text-white text-sm font-semibold rounded-md px-4 py-2 hover:bg-brand-dark">
           Filter
@@ -79,7 +80,11 @@ export default async function AdminUsersPage({
                     {u.email} &middot; {u.phone}
                   </p>
                   <p className="text-xs text-foreground/50">
-                    {u.role === "PRINCIPAL" ? `${u.schoolName}, ${u.district}` : `${u.businessName}, ${u.serviceArea}`}
+                    {u.role === "PRINCIPAL"
+                      ? `${u.schoolName}, ${u.district}`
+                      : u.role === "TEACHER"
+                      ? `${u.qualification}${u.subjectSpecialization ? `, ${TEACHING_SUBJECT_LABELS[u.subjectSpecialization]}` : ""}, ${u.serviceArea}`
+                      : `${u.businessName}, ${u.serviceArea}`}
                   </p>
                   {u.status === "REJECTED" && u.rejectionNote && (
                     <p className="text-xs text-red-600 mt-1">Reason: {u.rejectionNote}</p>

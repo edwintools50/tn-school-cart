@@ -13,7 +13,42 @@ enum Role {
   PRINCIPAL
   SUPPLIER
   WORKER
+  TEACHER
   ADMIN
+}
+
+enum TeachingSubject {
+  TAMIL
+  ENGLISH
+  MATHS
+  SCIENCE
+  SOCIAL_SCIENCE
+  COMPUTER_SCIENCE
+  PHYSICAL_EDUCATION
+  ARTS_CRAFT
+  MUSIC
+  PRIMARY_TEACHER
+  SPECIAL_EDUCATOR
+  LIBRARIAN
+  OTHER
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+}
+
+enum JobVacancyStatus {
+  OPEN
+  FILLED
+  CLOSED
+}
+
+enum JobApplicationStatus {
+  PENDING
+  HIRED
+  REJECTED
+  WITHDRAWN
 }
 
 enum ApprovalStatus {
@@ -104,6 +139,10 @@ model User {
   verificationPhotoUrl String?
   resetTokenHash      String?   @unique
   resetTokenExpiresAt DateTime?
+  // Teacher fields (serviceArea above is reused as "preferred district")
+  qualification         String?
+  subjectSpecialization TeachingSubject?
+  experienceYears        Int?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
@@ -114,6 +153,8 @@ model User {
   gigServices    GigService[]
   gigRequests    GigRequest[]   @relation("PrincipalGigRequests")
   gigOffers      GigOffer[]     @relation("WorkerGigOffers")
+  jobVacancies   JobVacancy[]   @relation("PrincipalJobVacancies")
+  jobApplications JobApplication[] @relation("TeacherJobApplications")
 }
 
 model Product {
@@ -238,4 +279,42 @@ model GigOffer {
   createdAt    DateTime       @default(now())
 
   @@unique([gigRequestId, workerId])
+}
+
+model JobVacancy {
+  id                    String             @id @default(cuid())
+  principalId           String
+  principal             User               @relation("PrincipalJobVacancies", fields: [principalId], references: [id], onDelete: Cascade)
+  subject               TeachingSubject
+  title                 String
+  description           String
+  schoolName            String
+  udiseNumber           String?
+  district              String
+  taluk                 String?
+  block                 String?
+  pinCode               String?
+  address               String
+  employmentType        EmploymentType
+  qualificationRequired String
+  experienceRequired    String
+  salaryRange           String?
+  status                JobVacancyStatus   @default(OPEN)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  applications          JobApplication[]
+}
+
+model JobApplication {
+  id           String               @id @default(cuid())
+  jobVacancyId String
+  jobVacancy   JobVacancy           @relation(fields: [jobVacancyId], references: [id], onDelete: Cascade)
+  teacherId    String
+  teacher      User                 @relation("TeacherJobApplications", fields: [teacherId], references: [id], onDelete: Cascade)
+  coverNote    String
+  status       JobApplicationStatus @default(PENDING)
+  createdAt    DateTime             @default(now())
+
+  @@unique([jobVacancyId, teacherId])
 }

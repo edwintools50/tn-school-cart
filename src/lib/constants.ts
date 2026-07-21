@@ -45,5 +45,27 @@ export const ROLE_LABELS: Record<string, string> = {
   PRINCIPAL: "School Principal / Head Master (Buyer)",
   SUPPLIER: "Supplier (Seller)",
   WORKER: "Gig Worker (Service Provider)",
+  TEACHER: "Teacher (Job Seeker)",
   ADMIN: "Admin",
+};
+
+export const TEACHING_SUBJECT_LABELS: Record<string, string> = {
+  TAMIL: "Tamil",
+  ENGLISH: "English",
+  MATHS: "Maths",
+  SCIENCE: "Science",
+  SOCIAL_SCIENCE: "Social Science",
+  COMPUTER_SCIENCE: "Computer Science",
+  PHYSICAL_EDUCATION: "Physical Education",
+  ARTS_CRAFT: "Arts & Craft",
+  MUSIC: "Music",
+  PRIMARY_TEACHER: "Primary Teacher (General)",
+  SPECIAL_EDUCATOR: "Special Educator",
+  LIBRARIAN: "Librarian",
+  OTHER: "Other Subject",
+};
+
+export const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
+  FULL_TIME: "Full-time",
+  PART_TIME: "Part-time",
 };

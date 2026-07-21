@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { registerAction } from "../actions";
-import { TN_DISTRICTS, ROLE_LABELS } from "@/lib/constants";
+import { TN_DISTRICTS, ROLE_LABELS, TEACHING_SUBJECT_LABELS } from "@/lib/constants";
 
 const inputClass =
   "w-full rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand";
@@ -11,18 +11,18 @@ const labelClass = "block text-sm font-medium mb-1";
 
 export default function RegisterPage() {
   const [state, formAction, pending] = useActionState(registerAction, undefined);
-  const [role, setRole] = useState<"PRINCIPAL" | "SUPPLIER" | "WORKER">("PRINCIPAL");
+  const [role, setRole] = useState<"PRINCIPAL" | "SUPPLIER" | "WORKER" | "TEACHER">("PRINCIPAL");
 
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-12">
       <div className="card w-full max-w-lg p-8">
         <h1 className="text-2xl font-bold mb-1">Create your account</h1>
         <p className="text-sm text-foreground/60 mb-6">
-          Join as a school buyer, a supplier, or a gig worker.
+          Join as a school buyer, a supplier, a gig worker, or a teacher looking for a job.
         </p>
 
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          {(["PRINCIPAL", "SUPPLIER", "WORKER"] as const).map((r) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+          {(["PRINCIPAL", "SUPPLIER", "WORKER", "TEACHER"] as const).map((r) => (
             <button
               key={r}
               type="button"
@@ -36,6 +36,7 @@ export default function RegisterPage() {
               {r === "PRINCIPAL" && "Principal (Buyer)"}
               {r === "SUPPLIER" && "Supplier (Seller)"}
               {r === "WORKER" && "Gig Worker"}
+              {r === "TEACHER" && "Teacher"}
             </button>
           ))}
         </div>
@@ -159,11 +160,77 @@ export default function RegisterPage() {
             </div>
           )}
 
+          {role === "TEACHER" && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass} htmlFor="qualification">
+                  Qualification
+                </label>
+                <input
+                  id="qualification"
+                  name="qualification"
+                  placeholder="e.g. B.Ed, M.A. Tamil"
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="subjectSpecialization">
+                  Subject specialization
+                </label>
+                <select
+                  id="subjectSpecialization"
+                  name="subjectSpecialization"
+                  required
+                  defaultValue=""
+                  className={inputClass}
+                >
+                  <option value="" disabled>
+                    Select subject
+                  </option>
+                  {Object.entries(TEACHING_SUBJECT_LABELS).map(([key, label]) => (
+                    <option key={key} value={key}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="experienceYears">
+                  Years of experience
+                </label>
+                <input
+                  id="experienceYears"
+                  name="experienceYears"
+                  type="number"
+                  min="0"
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="serviceArea">
+                  Preferred district
+                </label>
+                <select id="serviceArea" name="serviceArea" required defaultValue="" className={inputClass}>
+                  <option value="" disabled>
+                    Select district
+                  </option>
+                  {TN_DISTRICTS.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
           {role !== "PRINCIPAL" && (
             <p className="text-xs text-foreground/60 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
               {ROLE_LABELS[role]} accounts are reviewed by the TN School Cart admin
-              team before you can publish listings. You can still fill in your
-              details and prepare listings while you wait.
+              team before you can {role === "TEACHER" ? "apply to job vacancies" : "publish listings"}.
+              You can still fill in your details while you wait.
             </p>
           )}
 

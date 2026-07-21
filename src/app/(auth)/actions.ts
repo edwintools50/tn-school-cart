@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { createSession, destroySession } from "@/lib/session";
-import { Role } from "@/generated/prisma/enums";
+import { Role, TeachingSubject } from "@/generated/prisma/enums";
 import { uploadPhoto } from "@/lib/blob";
 import { sendPasswordResetEmail } from "@/lib/email";
 
@@ -48,12 +48,21 @@ const registerSchema = z.discriminatedUnion("role", [
     businessName: z.string().trim().min(2, "Your name / business name is required"),
     serviceArea: z.string().trim().min(2, "Service area is required"),
   }),
+  z.object({
+    role: z.literal(Role.TEACHER),
+    ...baseSchema,
+    qualification: z.string().trim().min(2, "Qualification is required"),
+    subjectSpecialization: z.enum(TeachingSubject),
+    experienceYears: z.coerce.number().int().min(0, "Experience can't be negative"),
+    serviceArea: z.string().trim().min(2, "Preferred district is required"),
+  }),
 ]);
 
 function redirectForRole(role: string): never {
   if (role === Role.ADMIN) redirect("/admin");
   if (role === Role.SUPPLIER) redirect("/dashboard/supplier");
   if (role === Role.WORKER) redirect("/dashboard/worker");
+  if (role === Role.TEACHER) redirect("/dashboard/teacher");
   redirect("/marketplace");
 }
 
@@ -102,9 +111,12 @@ export async function registerAction(
           ? data.businessName
           : undefined,
       serviceArea:
-        data.role === Role.SUPPLIER || data.role === Role.WORKER
+        data.role === Role.SUPPLIER || data.role === Role.WORKER || data.role === Role.TEACHER
           ? data.serviceArea
           : undefined,
+      qualification: data.role === Role.TEACHER ? data.qualification : undefined,
+      subjectSpecialization: data.role === Role.TEACHER ? data.subjectSpecialization : undefined,
+      experienceYears: data.role === Role.TEACHER ? data.experienceYears : undefined,
     },
   });
 
