@@ -105,6 +105,12 @@ export default async function WorkerDashboardPage() {
                 >
                   Edit
                 </Link>
+                <Link
+                  href={`/dashboard/worker/services/new?duplicate=${service.id}`}
+                  className="text-xs font-semibold text-brand hover:underline"
+                >
+                  Duplicate
+                </Link>
                 {service.status !== "DELISTED" && (
                   <form action={delistServiceAction}>
                     <input type="hidden" name="serviceId" value={service.id} />

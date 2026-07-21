@@ -100,6 +100,12 @@ export default async function SupplierDashboardPage() {
                 >
                   Edit
                 </Link>
+                <Link
+                  href={`/dashboard/supplier/products/new?duplicate=${product.id}`}
+                  className="text-xs font-semibold text-brand hover:underline"
+                >
+                  Duplicate
+                </Link>
                 {product.status !== "DELISTED" && (
                   <form action={delistProductAction}>
                     <input type="hidden" name="productId" value={product.id} />

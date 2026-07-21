@@ -36,11 +36,12 @@ export async function createProductAction(
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Photo upload failed." };
   }
+  const existingImageUrl = formData.get("existingImageUrl");
 
   await db.product.create({
     data: {
       ...parsed.data,
-      imageUrl: imageUrl ?? null,
+      imageUrl: imageUrl ?? (typeof existingImageUrl === "string" ? existingImageUrl : null),
       supplierId: user.id,
       status: "PENDING",
     },

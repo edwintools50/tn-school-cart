@@ -33,6 +33,9 @@ export default function ProductForm({
       {defaultValues?.productId && (
         <input type="hidden" name="productId" value={defaultValues.productId} />
       )}
+      {!defaultValues?.productId && defaultValues?.imageUrl && (
+        <input type="hidden" name="existingImageUrl" value={defaultValues.imageUrl} />
+      )}
 
       <div>
         <label className={labelClass} htmlFor="title">
