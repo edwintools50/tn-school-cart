@@ -319,3 +319,12 @@ model JobApplication {
 
   @@unique([jobVacancyId, teacherId])
 }
+
+model RateLimitAttempt {
+  id         String   @id @default(cuid())
+  identifier String
+  action     String
+  createdAt  DateTime @default(now())
+
+  @@index([identifier, action, createdAt])
+}

@@ -9,6 +9,8 @@ import { createSession, destroySession } from "@/lib/session";
 import { Role, TeachingSubject } from "@/generated/prisma/enums";
 import { uploadPhoto, uploadDocument } from "@/lib/blob";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { getClientIp } from "@/lib/request-ip";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 
@@ -70,6 +72,13 @@ export async function registerAction(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
+  const ip = await getClientIp();
+  const rate = await checkRateLimit(ip, "register", { max: 5, windowMs: 60 * 60 * 1000 });
+  if (!rate.allowed) {
+    const minutes = Math.ceil((rate.retryAfterSeconds ?? 0) / 60);
+    return { error: `Too many accounts created from this connection. Try again in ${minutes} minute(s).` };
+  }
+
   const raw = Object.fromEntries(formData.entries());
   const parsed = registerSchema.safeParse(raw);
   if (!parsed.success) {
@@ -144,6 +153,13 @@ export async function loginAction(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
+  const ip = await getClientIp();
+  const rate = await checkRateLimit(ip, "login", { max: 5, windowMs: 15 * 60 * 1000 });
+  if (!rate.allowed) {
+    const minutes = Math.ceil((rate.retryAfterSeconds ?? 0) / 60);
+    return { error: `Too many login attempts. Try again in ${minutes} minute(s).` };
+  }
+
   const parsed = loginSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
