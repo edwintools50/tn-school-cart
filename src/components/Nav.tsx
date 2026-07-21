@@ -115,6 +115,9 @@ export default async function Nav() {
                   </span>
                 )}
               </span>
+              <Link href="/account/settings" className={linkClass}>
+                Settings
+              </Link>
               <form action={logoutAction}>
                 <button
                   type="submit"
