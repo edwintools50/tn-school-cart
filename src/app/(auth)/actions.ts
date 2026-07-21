@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { createSession, destroySession } from "@/lib/session";
 import { Role, TeachingSubject } from "@/generated/prisma/enums";
-import { uploadPhoto } from "@/lib/blob";
+import { uploadPhoto, uploadDocument } from "@/lib/blob";
 import { sendPasswordResetEmail } from "@/lib/email";
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
@@ -94,6 +94,16 @@ export async function registerAction(
     }
   }
 
+  let resumeUrl: string | undefined;
+  if (data.role === Role.TEACHER) {
+    const resume = formData.get("resume") as File | null;
+    try {
+      resumeUrl = await uploadDocument(resume, "teacher-resumes");
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Resume upload failed." };
+    }
+  }
+
   const user = await db.user.create({
     data: {
       name: data.name,
@@ -117,6 +127,7 @@ export async function registerAction(
       qualification: data.role === Role.TEACHER ? data.qualification : undefined,
       subjectSpecialization: data.role === Role.TEACHER ? data.subjectSpecialization : undefined,
       experienceYears: data.role === Role.TEACHER ? data.experienceYears : undefined,
+      resumeUrl,
     },
   });
 

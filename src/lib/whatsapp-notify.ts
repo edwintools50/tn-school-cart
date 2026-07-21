@@ -22,7 +22,9 @@ type TemplateName =
   | "new_order_alert_v2"
   | "gig_offer_received"
   | "gig_assigned"
-  | "gig_status_update";
+  | "gig_status_update"
+  | "job_application_received"
+  | "job_application_hired";
 
 /**
  * Sends a pre-approved WhatsApp template message via Meta's Cloud API.
@@ -172,5 +174,31 @@ export async function notifyGigStatusUpdate(params: {
     params.jobTitle,
     params.schoolName,
     params.status,
+  ]);
+}
+
+export async function notifyJobApplicationReceived(params: {
+  phone: string;
+  principalName: string;
+  teacherName: string;
+  jobTitle: string;
+}) {
+  await sendTemplate(params.phone, "job_application_received", [
+    params.principalName,
+    params.teacherName,
+    params.jobTitle,
+  ]);
+}
+
+export async function notifyTeacherHired(params: {
+  phone: string;
+  teacherName: string;
+  jobTitle: string;
+  schoolName: string;
+}) {
+  await sendTemplate(params.phone, "job_application_hired", [
+    params.teacherName,
+    params.jobTitle,
+    params.schoolName,
   ]);
 }

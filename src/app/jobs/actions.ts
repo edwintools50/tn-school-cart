@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { TeachingSubject, EmploymentType, JobVacancyStatus } from "@/generated/prisma/enums";
+import { notifyJobApplicationReceived, notifyTeacherHired } from "@/lib/whatsapp-notify";
 
 export type ActionState = { error?: string } | undefined;
 
@@ -80,7 +81,10 @@ export async function submitApplicationAction(
   }
   const { jobVacancyId, coverNote } = parsed.data;
 
-  const jobVacancy = await db.jobVacancy.findUnique({ where: { id: jobVacancyId } });
+  const jobVacancy = await db.jobVacancy.findUnique({
+    where: { id: jobVacancyId },
+    include: { principal: true },
+  });
   if (!jobVacancy || jobVacancy.status !== "OPEN") {
     return { error: "This job vacancy is no longer open for applications." };
   }
@@ -89,6 +93,13 @@ export async function submitApplicationAction(
     where: { jobVacancyId_teacherId: { jobVacancyId, teacherId: user.id } },
     create: { jobVacancyId, teacherId: user.id, coverNote },
     update: { coverNote, status: "PENDING" },
+  });
+
+  await notifyJobApplicationReceived({
+    phone: jobVacancy.principal.phone,
+    principalName: jobVacancy.principal.name,
+    teacherName: user.name,
+    jobTitle: jobVacancy.title,
   });
 
   revalidatePath(`/jobs/${jobVacancyId}`);
@@ -114,6 +125,13 @@ export async function hireApplicationAction(formData: FormData) {
     }),
     db.jobVacancy.update({ where: { id: application.jobVacancyId }, data: { status: "FILLED" } }),
   ]);
+
+  await notifyTeacherHired({
+    phone: application.teacher.phone,
+    teacherName: application.teacher.name,
+    jobTitle: application.jobVacancy.title,
+    schoolName: application.jobVacancy.schoolName,
+  });
 
   revalidatePath(`/jobs/${application.jobVacancyId}`);
 }

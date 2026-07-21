@@ -143,6 +143,7 @@ model User {
   qualification         String?
   subjectSpecialization TeachingSubject?
   experienceYears        Int?
+  resumeUrl              String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { TEACHING_SUBJECT_LABELS } from "@/lib/constants";
+import ResumeUploadForm from "@/components/ResumeUploadForm";
 
 const applicationStatusColor: Record<string, string> = {
   PENDING: "bg-gray-100 text-gray-700",
@@ -46,6 +47,21 @@ export default async function TeacherDashboardPage() {
           account is approved by the TN School Cart admin team.
         </div>
       )}
+
+      <div className="card p-4 mt-6">
+        <h2 className="font-semibold mb-2 text-sm">Resume</h2>
+        {user.resumeUrl && (
+          <a
+            href={user.resumeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-brand hover:underline block mb-3"
+          >
+            View current resume &rarr;
+          </a>
+        )}
+        <ResumeUploadForm />
+      </div>
 
       <h2 className="font-semibold mt-8 mb-3">My applications</h2>
 

@@ -86,6 +86,16 @@ export default async function AdminUsersPage({
                       ? `${u.qualification}${u.subjectSpecialization ? `, ${TEACHING_SUBJECT_LABELS[u.subjectSpecialization]}` : ""}, ${u.serviceArea}`
                       : `${u.businessName}, ${u.serviceArea}`}
                   </p>
+                  {u.role === "TEACHER" && u.resumeUrl && (
+                    <a
+                      href={u.resumeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-brand hover:underline"
+                    >
+                      View resume &rarr;
+                    </a>
+                  )}
                   {u.status === "REJECTED" && u.rejectionNote && (
                     <p className="text-xs text-red-600 mt-1">Reason: {u.rejectionNote}</p>
                   )}

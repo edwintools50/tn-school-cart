@@ -128,6 +128,16 @@ export default async function JobVacancyDetailPage({
                   </span>
                 </div>
                 <p className="text-sm mt-2">{application.coverNote}</p>
+                {application.teacher.resumeUrl && (
+                  <a
+                    href={application.teacher.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-brand hover:underline mt-2 inline-block"
+                  >
+                    View resume &rarr;
+                  </a>
+                )}
                 {jobVacancy.status === "OPEN" && application.status === "PENDING" && (
                   <form action={hireApplicationAction} className="mt-3">
                     <input type="hidden" name="applicationId" value={application.id} />

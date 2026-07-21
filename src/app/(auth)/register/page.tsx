@@ -223,6 +223,21 @@ export default function RegisterPage() {
                   ))}
                 </select>
               </div>
+              <div className="col-span-2">
+                <label className={labelClass} htmlFor="resume">
+                  Resume / CV (PDF, optional)
+                </label>
+                <input
+                  id="resume"
+                  name="resume"
+                  type="file"
+                  accept="application/pdf"
+                  className={inputClass}
+                />
+                <p className="text-xs text-foreground/50 mt-1">
+                  Helps schools review your profile faster. You can add or update this later too.
+                </p>
+              </div>
             </div>
           )}
 
