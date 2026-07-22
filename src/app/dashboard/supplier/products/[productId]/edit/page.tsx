@@ -34,6 +34,8 @@ export default async function EditProductPage({
             unit: product.unit,
             stock: product.stock,
             imageUrl: product.imageUrl,
+            isDigital: product.isDigital,
+            fileUrl: product.fileUrl,
           }}
         />
       </div>

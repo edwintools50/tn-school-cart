@@ -3,6 +3,7 @@ import crypto from "crypto";
 import Razorpay from "razorpay";
 import { db } from "@/lib/db";
 import { notifyNewOrder, notifyOrderPlaced } from "@/lib/whatsapp-notify";
+import { sendDigitalDeliveryEmail } from "@/lib/email";
 
 export function isRazorpayConfigured() {
   return Boolean(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
@@ -83,7 +84,10 @@ export async function confirmOrderPayment(razorpayOrderId: string, razorpayPayme
 
   const [buyer, items] = await Promise.all([
     db.user.findUniqueOrThrow({ where: { id: order.buyerId } }),
-    db.orderItem.findMany({ where: { orderId: order.id }, include: { supplier: true } }),
+    db.orderItem.findMany({
+      where: { orderId: order.id },
+      include: { supplier: true, product: true },
+    }),
   ]);
 
   const orderShortId = order.id.slice(-8);
@@ -105,6 +109,11 @@ export async function confirmOrderPayment(razorpayOrderId: string, razorpayPayme
       orderShortId,
     });
   }
+
+  const digitalItems = items
+    .filter((item) => item.product.isDigital && item.product.fileUrl)
+    .map((item) => ({ title: item.titleAtOrder, fileUrl: item.product.fileUrl! }));
+  await sendDigitalDeliveryEmail(buyer.email, buyer.name, orderShortId, digitalItems);
 
   return { ok: true as const, alreadyConfirmed: false };
 }

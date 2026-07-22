@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { notifyNewOrder, notifyOrderPlaced } from "@/lib/whatsapp-notify";
 import { createRazorpayOrder, isRazorpayConfigured } from "@/lib/razorpay";
+import { sendDigitalDeliveryEmail } from "@/lib/email";
 
 export async function addToCartAction(formData: FormData) {
   const user = await requireUser(["PRINCIPAL"]);
@@ -53,36 +54,43 @@ export async function removeCartItemAction(formData: FormData) {
 export async function placeOrderAction(formData: FormData) {
   const user = await requireUser(["PRINCIPAL"]);
 
-  const shippingSchool = String(formData.get("shippingSchool") ?? "").trim();
-  const shippingUdise = String(formData.get("shippingUdise") ?? "").trim();
-  const shippingDistrict = String(formData.get("shippingDistrict") ?? "").trim();
-  const shippingTaluk = String(formData.get("shippingTaluk") ?? "").trim();
-  const shippingBlock = String(formData.get("shippingBlock") ?? "").trim();
-  const shippingPinCode = String(formData.get("shippingPinCode") ?? "").trim();
-  const shippingAddress = String(formData.get("shippingAddress") ?? "").trim();
-
-  if (
-    !shippingSchool ||
-    !shippingDistrict ||
-    !shippingAddress ||
-    !shippingTaluk ||
-    !shippingBlock
-  ) {
-    throw new Error("Please fill in all delivery details.");
-  }
-  if (!/^\d{11}$/.test(shippingUdise)) {
-    throw new Error("Enter a valid 11-digit UDISE number.");
-  }
-  if (!/^\d{6}$/.test(shippingPinCode)) {
-    throw new Error("Enter a valid 6-digit pin code.");
-  }
-
   const cartItems = await db.cartItem.findMany({
     where: { buyerId: user.id },
     include: { product: { include: { supplier: true } } },
   });
   if (cartItems.length === 0) {
     throw new Error("Your cart is empty.");
+  }
+  const allDigital = cartItems.every((item) => item.product.isDigital);
+
+  let shippingSchool = String(formData.get("shippingSchool") ?? "").trim();
+  const shippingUdise = String(formData.get("shippingUdise") ?? "").trim();
+  let shippingDistrict = String(formData.get("shippingDistrict") ?? "").trim();
+  const shippingTaluk = String(formData.get("shippingTaluk") ?? "").trim();
+  const shippingBlock = String(formData.get("shippingBlock") ?? "").trim();
+  const shippingPinCode = String(formData.get("shippingPinCode") ?? "").trim();
+  let shippingAddress = String(formData.get("shippingAddress") ?? "").trim();
+
+  if (allDigital) {
+    shippingSchool ||= user.schoolName ?? "N/A (digital order)";
+    shippingDistrict ||= user.district ?? "N/A";
+    shippingAddress ||= "Digital delivery — no physical address required.";
+  } else {
+    if (
+      !shippingSchool ||
+      !shippingDistrict ||
+      !shippingAddress ||
+      !shippingTaluk ||
+      !shippingBlock
+    ) {
+      throw new Error("Please fill in all delivery details.");
+    }
+    if (!/^\d{11}$/.test(shippingUdise)) {
+      throw new Error("Enter a valid 11-digit UDISE number.");
+    }
+    if (!/^\d{6}$/.test(shippingPinCode)) {
+      throw new Error("Enter a valid 6-digit pin code.");
+    }
   }
 
   for (const item of cartItems) {
@@ -165,6 +173,11 @@ export async function placeOrderAction(formData: FormData) {
         orderShortId,
       });
     }
+
+    const digitalItems = cartItems
+      .filter((item) => item.product.isDigital && item.product.fileUrl)
+      .map((item) => ({ title: item.product.title, fileUrl: item.product.fileUrl! }));
+    await sendDigitalDeliveryEmail(user.email, user.name, orderShortId, digitalItems);
   }
 
   revalidatePath("/orders");

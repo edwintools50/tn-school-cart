@@ -7,7 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ProductCategory, OrderStatus } from "@/generated/prisma/enums";
 import { notifyOrderStatusUpdate } from "@/lib/whatsapp-notify";
-import { uploadPhoto } from "@/lib/blob";
+import { uploadPhoto, uploadDigitalFile } from "@/lib/blob";
 
 export type ActionState = { error?: string } | undefined;
 
@@ -18,6 +18,7 @@ const productSchema = z.object({
   price: z.coerce.number().positive("Price must be greater than 0"),
   unit: z.string().trim().min(1).default("piece"),
   stock: z.coerce.number().int().min(0, "Stock can't be negative"),
+  isDigital: z.coerce.boolean().optional().default(false),
 });
 
 export async function createProductAction(
@@ -38,10 +39,25 @@ export async function createProductAction(
   }
   const existingImageUrl = formData.get("existingImageUrl");
 
+  let fileUrl: string | undefined;
+  if (parsed.data.isDigital) {
+    try {
+      fileUrl = await uploadDigitalFile(formData.get("digitalFile") as File | null, "digital-products");
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Digital file upload failed." };
+    }
+    const existingFileUrl = formData.get("existingFileUrl");
+    fileUrl = fileUrl ?? (typeof existingFileUrl === "string" ? existingFileUrl : undefined);
+    if (!fileUrl) {
+      return { error: "Please upload a digital file." };
+    }
+  }
+
   await db.product.create({
     data: {
       ...parsed.data,
       imageUrl: imageUrl ?? (typeof existingImageUrl === "string" ? existingImageUrl : null),
+      fileUrl: fileUrl ?? null,
       supplierId: user.id,
       status: "PENDING",
     },
@@ -75,11 +91,26 @@ export async function updateProductAction(
     return { error: e instanceof Error ? e.message : "Photo upload failed." };
   }
 
+  let fileUrl: string | null = null;
+  if (parsed.data.isDigital) {
+    let uploaded: string | undefined;
+    try {
+      uploaded = await uploadDigitalFile(formData.get("digitalFile") as File | null, "digital-products");
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Digital file upload failed." };
+    }
+    fileUrl = uploaded ?? existing.fileUrl;
+    if (!fileUrl) {
+      return { error: "Please upload a digital file." };
+    }
+  }
+
   await db.product.update({
     where: { id: productId },
     data: {
       ...parsed.data,
       ...(imageUrl ? { imageUrl } : {}),
+      fileUrl,
       status: "PENDING",
       rejectionNote: null,
     },

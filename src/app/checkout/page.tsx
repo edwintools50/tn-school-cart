@@ -18,6 +18,7 @@ export default async function CheckoutPage() {
 
   const total = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const razorpayReady = isRazorpayConfigured();
+  const allDigital = cartItems.every((item) => item.product.isDigital);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 w-full">
@@ -25,6 +26,14 @@ export default async function CheckoutPage() {
 
       <div className="grid sm:grid-cols-2 gap-8">
         <form action={placeOrderAction} className="space-y-4">
+          {allDigital ? (
+            <div className="bg-brand/10 border border-brand/30 rounded-md px-3 py-3 text-sm text-brand">
+              This order is fully digital &mdash; no delivery address needed.
+              You&apos;ll get download link(s) by email once payment is
+              confirmed.
+            </div>
+          ) : (
+            <>
           <h2 className="font-semibold">Delivery details</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -125,6 +134,8 @@ export default async function CheckoutPage() {
               className="w-full rounded-md border border-border px-3 py-2 text-sm"
             />
           </div>
+            </>
+          )}
 
           {razorpayReady ? (
             <div className="bg-brand/10 border border-brand/30 rounded-md px-3 py-2 text-xs text-brand">

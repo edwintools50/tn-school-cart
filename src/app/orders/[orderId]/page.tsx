@@ -22,10 +22,12 @@ export default async function OrderDetailPage({
 
   const order = await db.order.findUnique({
     where: { id: orderId },
-    include: { items: { include: { supplier: true } } },
+    include: { items: { include: { supplier: true, product: true } } },
   });
 
   if (!order || order.buyerId !== user.id) notFound();
+
+  const allDigital = order.items.every((item) => item.product.isDigital);
 
   const whatsappHref = whatsappLink(
     `Hi TN School Cart, I'd like an update on Order #${order.id.slice(-8)} (${order.shippingSchool}). Total: ₹${order.totalAmount.toFixed(2)}${order.paid ? " (Paid)" : ""}.`
@@ -48,30 +50,49 @@ export default async function OrderDetailPage({
         Placed on {new Date(order.createdAt).toLocaleString("en-IN")}
       </p>
 
-      <div className="card p-4 mb-6">
-        <h2 className="font-semibold mb-2">Delivery to</h2>
-        <p className="text-sm">{order.shippingSchool}</p>
-        {order.shippingUdise && (
-          <p className="text-xs text-foreground/50">UDISE: {order.shippingUdise}</p>
-        )}
-        <p className="text-sm text-foreground/60">{order.shippingAddress}</p>
-        <p className="text-sm text-foreground/60">
-          {[order.shippingBlock, order.shippingTaluk].filter(Boolean).join(", ")}
-          {order.shippingBlock || order.shippingTaluk ? ", " : ""}
-          {order.shippingDistrict} District, Tamil Nadu
-          {order.shippingPinCode ? ` - ${order.shippingPinCode}` : ""}
-        </p>
-      </div>
+      {!allDigital && (
+        <div className="card p-4 mb-6">
+          <h2 className="font-semibold mb-2">Delivery to</h2>
+          <p className="text-sm">{order.shippingSchool}</p>
+          {order.shippingUdise && (
+            <p className="text-xs text-foreground/50">UDISE: {order.shippingUdise}</p>
+          )}
+          <p className="text-sm text-foreground/60">{order.shippingAddress}</p>
+          <p className="text-sm text-foreground/60">
+            {[order.shippingBlock, order.shippingTaluk].filter(Boolean).join(", ")}
+            {order.shippingBlock || order.shippingTaluk ? ", " : ""}
+            {order.shippingDistrict} District, Tamil Nadu
+            {order.shippingPinCode ? ` - ${order.shippingPinCode}` : ""}
+          </p>
+        </div>
+      )}
 
       <div className="card divide-y divide-border mb-6">
         {order.items.map((item) => (
           <div key={item.id} className="p-4 flex items-center justify-between gap-4">
             <div>
-              <p className="font-semibold">{item.titleAtOrder}</p>
+              <p className="font-semibold">
+                {item.titleAtOrder}
+                {item.product.isDigital && (
+                  <span className="ml-2 text-xs font-semibold text-brand bg-brand/10 rounded-full px-2 py-0.5 align-middle">
+                    Digital
+                  </span>
+                )}
+              </p>
               <p className="text-xs text-foreground/50">
                 Sold by {item.supplier.businessName ?? item.supplier.name} &middot;{" "}
                 {item.quantity} &times; &#8377;{item.priceAtOrder.toFixed(2)}
               </p>
+              {order.paid && item.product.isDigital && item.product.fileUrl && (
+                <a
+                  href={item.product.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold text-brand hover:underline"
+                >
+                  Download &rarr;
+                </a>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <span className="font-semibold">

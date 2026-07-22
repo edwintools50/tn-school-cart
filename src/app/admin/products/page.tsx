@@ -58,12 +58,29 @@ export default async function AdminProductsPage({
                   </a>
                 )}
                 <div>
-                  <p className="font-semibold">{p.title}</p>
+                  <p className="font-semibold">
+                    {p.title}
+                    {p.isDigital && (
+                      <span className="ml-2 text-xs font-semibold text-brand bg-brand/10 rounded-full px-2 py-0.5 align-middle">
+                        Digital
+                      </span>
+                    )}
+                  </p>
                   <p className="text-xs text-foreground/50">
                     {PRODUCT_CATEGORY_LABELS[p.category]} &middot; &#8377;{p.price.toFixed(2)} / {p.unit} &middot;{" "}
                     by {p.supplier.businessName ?? p.supplier.name}
                   </p>
                   <p className="text-xs text-foreground/60 mt-1 max-w-xl">{p.description}</p>
+                  {p.isDigital && p.fileUrl && (
+                    <a
+                      href={p.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold text-brand hover:underline"
+                    >
+                      Review digital file &rarr;
+                    </a>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">

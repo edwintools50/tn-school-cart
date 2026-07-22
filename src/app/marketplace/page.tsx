@@ -85,9 +85,16 @@ export default async function MarketplacePage({
                   <span className="text-xs text-foreground/40">No image</span>
                 )}
               </div>
-              <span className="text-xs font-semibold text-accent uppercase tracking-wide">
-                {PRODUCT_CATEGORY_LABELS[product.category]}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-accent uppercase tracking-wide">
+                  {PRODUCT_CATEGORY_LABELS[product.category]}
+                </span>
+                {product.isDigital && (
+                  <span className="text-xs font-semibold text-brand bg-brand/10 rounded-full px-2 py-0.5">
+                    Digital
+                  </span>
+                )}
+              </div>
               <Link
                 href={`/marketplace/${product.id}`}
                 className="font-semibold hover:text-brand line-clamp-1"
@@ -104,7 +111,9 @@ export default async function MarketplacePage({
                 <span className="font-bold">
                   &#8377;{product.price.toFixed(2)} / {product.unit}
                 </span>
-                <span className="text-xs text-foreground/50">{product.stock} in stock</span>
+                <span className="text-xs text-foreground/50">
+                  {product.isDigital ? "Instant download" : `${product.stock} in stock`}
+                </span>
               </div>
 
               {user?.role === "PRINCIPAL" ? (

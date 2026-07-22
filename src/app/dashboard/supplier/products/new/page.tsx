@@ -41,6 +41,8 @@ export default async function NewProductPage({
                   unit: sourceProduct.unit,
                   stock: sourceProduct.stock,
                   imageUrl: sourceProduct.imageUrl,
+                  isDigital: sourceProduct.isDigital,
+                  fileUrl: sourceProduct.fileUrl,
                 }
               : undefined
           }

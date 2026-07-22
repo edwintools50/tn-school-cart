@@ -41,9 +41,16 @@ export default async function ProductDetailPage({
         </div>
 
         <div>
-          <span className="text-xs font-semibold text-accent uppercase tracking-wide">
-            {PRODUCT_CATEGORY_LABELS[product.category]}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-accent uppercase tracking-wide">
+              {PRODUCT_CATEGORY_LABELS[product.category]}
+            </span>
+            {product.isDigital && (
+              <span className="text-xs font-semibold text-brand bg-brand/10 rounded-full px-2 py-0.5">
+                Digital &mdash; delivered by email
+              </span>
+            )}
+          </div>
           <h1 className="text-2xl font-bold mt-1">{product.title}</h1>
           <p className="text-sm text-foreground/60 mt-1">
             Sold by {product.supplier.businessName ?? product.supplier.name} &middot;{" "}
@@ -54,7 +61,9 @@ export default async function ProductDetailPage({
             &#8377;{product.price.toFixed(2)}{" "}
             <span className="text-sm font-normal text-foreground/50">/ {product.unit}</span>
           </p>
-          <p className="text-sm text-foreground/50 mt-1">{product.stock} in stock</p>
+          <p className="text-sm text-foreground/50 mt-1">
+            {product.isDigital ? "Instant download after payment" : `${product.stock} in stock`}
+          </p>
 
           <p className="mt-4 text-sm leading-relaxed">{product.description}</p>
 

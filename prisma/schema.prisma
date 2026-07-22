@@ -169,6 +169,8 @@ model Product {
   unit        String          @default("piece")
   stock       Int             @default(0)
   imageUrl    String?
+  isDigital   Boolean         @default(false)
+  fileUrl     String?
   status      ProductStatus   @default(PENDING)
   rejectionNote String?
   createdAt   DateTime        @default(now())

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { PRODUCT_CATEGORY_LABELS } from "@/lib/constants";
 import type { ActionState } from "@/app/dashboard/supplier/actions";
 
@@ -23,10 +23,13 @@ export default function ProductForm({
     unit?: string;
     stock?: number;
     imageUrl?: string | null;
+    isDigital?: boolean;
+    fileUrl?: string | null;
   };
   submitLabel: string;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
+  const [isDigital, setIsDigital] = useState(defaultValues?.isDigital ?? false);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -35,6 +38,9 @@ export default function ProductForm({
       )}
       {!defaultValues?.productId && defaultValues?.imageUrl && (
         <input type="hidden" name="existingImageUrl" value={defaultValues.imageUrl} />
+      )}
+      {!defaultValues?.productId && defaultValues?.fileUrl && (
+        <input type="hidden" name="existingFileUrl" value={defaultValues.fileUrl} />
       )}
 
       <div>
@@ -64,6 +70,22 @@ export default function ProductForm({
         />
       </div>
 
+      <div className="flex items-center gap-2">
+        <input
+          id="isDigital"
+          name="isDigital"
+          type="checkbox"
+          value="true"
+          checked={isDigital}
+          onChange={(e) => setIsDigital(e.target.checked)}
+          className="h-4 w-4"
+        />
+        <label htmlFor="isDigital" className="text-sm font-medium">
+          This is a digital product (e-content) &mdash; buyers get an emailed
+          download link instead of a physical delivery
+        </label>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelClass} htmlFor="category">
@@ -87,17 +109,23 @@ export default function ProductForm({
           </select>
         </div>
         <div>
-          <label className={labelClass} htmlFor="unit">
-            Unit
-          </label>
-          <input
-            id="unit"
-            name="unit"
-            placeholder="piece, box, dozen..."
-            defaultValue={defaultValues?.unit ?? "piece"}
-            required
-            className={inputClass}
-          />
+          {isDigital ? (
+            <input type="hidden" name="unit" value="download" />
+          ) : (
+            <>
+              <label className={labelClass} htmlFor="unit">
+                Unit
+              </label>
+              <input
+                id="unit"
+                name="unit"
+                placeholder="piece, box, dozen..."
+                defaultValue={defaultValues?.unit ?? "piece"}
+                required
+                className={inputClass}
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -118,24 +146,61 @@ export default function ProductForm({
           />
         </div>
         <div>
-          <label className={labelClass} htmlFor="stock">
-            Stock available
-          </label>
-          <input
-            id="stock"
-            name="stock"
-            type="number"
-            min="0"
-            required
-            defaultValue={defaultValues?.stock}
-            className={inputClass}
-          />
+          {isDigital ? (
+            <input type="hidden" name="stock" value="999999" />
+          ) : (
+            <>
+              <label className={labelClass} htmlFor="stock">
+                Stock available
+              </label>
+              <input
+                id="stock"
+                name="stock"
+                type="number"
+                min="0"
+                required
+                defaultValue={defaultValues?.stock}
+                className={inputClass}
+              />
+            </>
+          )}
         </div>
       </div>
 
+      {isDigital && (
+        <div>
+          <label className={labelClass} htmlFor="digitalFile">
+            Digital file (PDF, ZIP, DOC, DOCX, PPT, or PPTX &mdash; max 3.5MB)
+          </label>
+          {defaultValues?.fileUrl && (
+            <a
+              href={defaultValues.fileUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-brand hover:underline block mb-2"
+            >
+              Current file &rarr;
+            </a>
+          )}
+          <input
+            id="digitalFile"
+            name="digitalFile"
+            type="file"
+            accept=".pdf,.zip,.doc,.docx,.ppt,.pptx"
+            required={!defaultValues?.fileUrl}
+            className={inputClass}
+          />
+          {defaultValues?.fileUrl && (
+            <p className="text-xs text-foreground/50 mt-1">
+              Leave blank to keep the current file.
+            </p>
+          )}
+        </div>
+      )}
+
       <div>
         <label className={labelClass} htmlFor="imagePhoto">
-          Product photo (optional)
+          {isDigital ? "Cover image (optional)" : "Product photo (optional)"}
         </label>
         {defaultValues?.imageUrl && (
           <img
