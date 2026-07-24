@@ -36,7 +36,7 @@ export async function sendDigitalDeliveryEmail(
   to: string,
   buyerName: string,
   orderShortId: string,
-  items: { title: string; fileUrl: string }[]
+  items: { title: string; productId: string }[]
 ): Promise<void> {
   if (items.length === 0) return;
 
@@ -50,9 +50,13 @@ export async function sendDigitalDeliveryEmail(
 
   const resend = new Resend(apiKey);
   const from = process.env.EMAIL_FROM ?? "TN School Cart <onboarding@resend.dev>";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tnschoolcart.com";
 
+  // Link to our own purchase-gated download route, not the underlying Blob
+  // URL directly — the file location itself is only ever revealed to a
+  // signed-in buyer with a paid order for this exact product.
   const linksHtml = items
-    .map((item) => `<li><a href="${item.fileUrl}">${item.title}</a></li>`)
+    .map((item) => `<li><a href="${baseUrl}/api/downloads/${item.productId}">${item.title}</a></li>`)
     .join("");
 
   try {

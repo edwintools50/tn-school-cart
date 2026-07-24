@@ -40,7 +40,7 @@ export default function ChangePasswordForm() {
           id="newPassword"
           name="newPassword"
           type="password"
-          minLength={6}
+          minLength={8}
           required
           className={inputClass}
         />
@@ -53,7 +53,7 @@ export default function ChangePasswordForm() {
           id="confirmPassword"
           name="confirmPassword"
           type="password"
-          minLength={6}
+          minLength={8}
           required
           className={inputClass}
         />

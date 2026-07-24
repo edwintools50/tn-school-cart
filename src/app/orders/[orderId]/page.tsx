@@ -85,9 +85,9 @@ export default async function OrderDetailPage({
               </p>
               {order.paid && item.product.isDigital && item.product.fileUrl && (
                 <a
-                  href={item.product.fileUrl}
+                  href={`/api/downloads/${item.productId}`}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener"
                   className="text-xs font-semibold text-brand hover:underline"
                 >
                   Download &rarr;

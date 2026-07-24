@@ -74,7 +74,7 @@ export default function RegisterPage() {
               id="password"
               name="password"
               type="password"
-              minLength={6}
+              minLength={8}
               required
               className={inputClass}
             />

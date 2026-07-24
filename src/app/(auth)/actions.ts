@@ -24,7 +24,7 @@ const baseSchema = {
   name: z.string().trim().min(2, "Name is required"),
   email: z.string().trim().toLowerCase().email("Enter a valid email"),
   phone: z.string().trim().min(8, "Enter a valid phone number"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 };
 
 const registerSchema = z.discriminatedUnion("role", [
@@ -232,7 +232,7 @@ export async function requestPasswordResetAction(
 
 const resetPasswordSchema = z.object({
   token: z.string().min(1, "Reset link is invalid."),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export async function resetPasswordAction(

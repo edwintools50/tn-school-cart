@@ -23,7 +23,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
           id="password"
           name="password"
           type="password"
-          minLength={6}
+          minLength={8}
           required
           className={inputClass}
         />

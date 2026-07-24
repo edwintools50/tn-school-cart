@@ -1,5 +1,14 @@
 import { put } from "@vercel/blob";
 
+// Storage keys only need to be unique and legible for debugging — never trust
+// a client-supplied filename verbatim (unusual characters, path-like
+// sequences, excessive length).
+function safeFileName(name: string): string {
+  const trimmed = name.trim().slice(-100);
+  const cleaned = trimmed.replace(/[^a-zA-Z0-9._-]/g, "_");
+  return cleaned || "file";
+}
+
 const MAX_SIZE = 5 * 1024 * 1024;
 // Kept under the 4mb Server Action body limit (next.config.ts), minus
 // multipart overhead and the other form fields sent alongside the file.
@@ -24,7 +33,7 @@ export async function uploadPhoto(file: File | null, folder: string): Promise<st
   if (file.size > MAX_SIZE) {
     throw new Error("Photo must be smaller than 5MB.");
   }
-  const blob = await put(`${folder}/${file.name}`, file, {
+  const blob = await put(`${folder}/${safeFileName(file.name)}`, file, {
     access: "public",
     addRandomSuffix: true,
   });
@@ -39,7 +48,7 @@ export async function uploadDocument(file: File | null, folder: string): Promise
   if (file.size > MAX_SIZE) {
     throw new Error("Resume must be smaller than 5MB.");
   }
-  const blob = await put(`${folder}/${file.name}`, file, {
+  const blob = await put(`${folder}/${safeFileName(file.name)}`, file, {
     access: "public",
     addRandomSuffix: true,
   });
@@ -54,7 +63,7 @@ export async function uploadDigitalFile(file: File | null, folder: string): Prom
   if (file.size > DIGITAL_MAX_SIZE) {
     throw new Error("Digital file must be smaller than 3.5MB.");
   }
-  const blob = await put(`${folder}/${file.name}`, file, {
+  const blob = await put(`${folder}/${safeFileName(file.name)}`, file, {
     access: "public",
     addRandomSuffix: true,
   });

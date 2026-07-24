@@ -176,7 +176,7 @@ export async function placeOrderAction(formData: FormData) {
 
     const digitalItems = cartItems
       .filter((item) => item.product.isDigital && item.product.fileUrl)
-      .map((item) => ({ title: item.product.title, fileUrl: item.product.fileUrl! }));
+      .map((item) => ({ title: item.product.title, productId: item.productId }));
     await sendDigitalDeliveryEmail(user.email, user.name, orderShortId, digitalItems);
   }
 

@@ -112,7 +112,7 @@ export async function confirmOrderPayment(razorpayOrderId: string, razorpayPayme
 
   const digitalItems = items
     .filter((item) => item.product.isDigital && item.product.fileUrl)
-    .map((item) => ({ title: item.titleAtOrder, fileUrl: item.product.fileUrl! }));
+    .map((item) => ({ title: item.titleAtOrder, productId: item.productId }));
   await sendDigitalDeliveryEmail(buyer.email, buyer.name, orderShortId, digitalItems);
 
   return { ok: true as const, alreadyConfirmed: false };
