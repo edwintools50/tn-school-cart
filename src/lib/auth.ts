@@ -17,6 +17,10 @@ export async function getCurrentUser() {
   const session = await readSession();
   if (!session) return null;
   const user = await db.user.findUnique({ where: { id: session.userId } });
+  // A suspension must take effect immediately, not just block future logins —
+  // otherwise a suspended user with an existing session keeps full access
+  // until their 30-day session cookie naturally expires.
+  if (user?.status === "SUSPENDED") return null;
   return user;
 }
 

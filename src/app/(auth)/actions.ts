@@ -194,6 +194,13 @@ export async function requestPasswordResetAction(
   _prevState: RequestResetState,
   formData: FormData
 ): Promise<RequestResetState> {
+  const ip = await getClientIp();
+  const rate = await checkRateLimit(ip, "forgot-password", { max: 5, windowMs: 15 * 60 * 1000 });
+  if (!rate.allowed) {
+    const minutes = Math.ceil((rate.retryAfterSeconds ?? 0) / 60);
+    return { error: `Too many reset requests. Try again in ${minutes} minute(s).` };
+  }
+
   const parsed = requestResetSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };

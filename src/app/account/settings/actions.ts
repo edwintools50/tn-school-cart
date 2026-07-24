@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export type ChangePasswordState = { error?: string; success?: boolean } | undefined;
 
@@ -23,6 +24,13 @@ export async function changePasswordAction(
   formData: FormData
 ): Promise<ChangePasswordState> {
   const user = await requireUser();
+
+  const rate = await checkRateLimit(user.id, "change-password", { max: 5, windowMs: 15 * 60 * 1000 });
+  if (!rate.allowed) {
+    const minutes = Math.ceil((rate.retryAfterSeconds ?? 0) / 60);
+    return { error: `Too many attempts. Try again in ${minutes} minute(s).` };
+  }
+
   const parsed = changePasswordSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };

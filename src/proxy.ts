@@ -5,7 +5,10 @@ import { jwtVerify } from "jose";
 const SESSION_COOKIE = "tnsc_session";
 
 function secretKey() {
-  const secret = process.env.SESSION_SECRET ?? "dev-only-insecure-secret-change-me";
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    throw new Error("SESSION_SECRET environment variable is not set.");
+  }
   return new TextEncoder().encode(secret);
 }
 
