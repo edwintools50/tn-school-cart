@@ -154,7 +154,12 @@ export async function loginAction(
   formData: FormData
 ): Promise<ActionState> {
   const ip = await getClientIp();
-  const rate = await checkRateLimit(ip, "login", { max: 5, windowMs: 15 * 60 * 1000 });
+  // Keyed by IP+email, not IP alone — a school office or shared campus
+  // network can put many different staff behind one public IP, and a pure
+  // per-IP limit would let one person's failed attempts lock everyone else
+  // on that connection out of their own, unrelated accounts.
+  const emailRaw = String(formData.get("email") ?? "").trim().toLowerCase();
+  const rate = await checkRateLimit(`${ip}:${emailRaw}`, "login", { max: 5, windowMs: 15 * 60 * 1000 });
   if (!rate.allowed) {
     const minutes = Math.ceil((rate.retryAfterSeconds ?? 0) / 60);
     return { error: `Too many login attempts. Try again in ${minutes} minute(s).` };
@@ -195,7 +200,11 @@ export async function requestPasswordResetAction(
   formData: FormData
 ): Promise<RequestResetState> {
   const ip = await getClientIp();
-  const rate = await checkRateLimit(ip, "forgot-password", { max: 5, windowMs: 15 * 60 * 1000 });
+  // Same reasoning as login: key by IP+email so one shared school/office
+  // connection can't have one person's repeated reset requests block
+  // everyone else on it from requesting their own.
+  const emailRaw = String(formData.get("email") ?? "").trim().toLowerCase();
+  const rate = await checkRateLimit(`${ip}:${emailRaw}`, "forgot-password", { max: 5, windowMs: 15 * 60 * 1000 });
   if (!rate.allowed) {
     const minutes = Math.ceil((rate.retryAfterSeconds ?? 0) / 60);
     return { error: `Too many reset requests. Try again in ${minutes} minute(s).` };
