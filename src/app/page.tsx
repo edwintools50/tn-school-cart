@@ -64,6 +64,35 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-4 pt-10">
+        <a
+          href="https://claude.ai/code/artifact/d949175d-a593-4836-bc0e-6c36a91b8ba3"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="card flex flex-col sm:flex-row sm:items-center gap-4 p-5 sm:p-6 hover:border-[#e6007e]/60 transition-colors group"
+        >
+          <span className="shrink-0 inline-flex items-center gap-2 rounded-full bg-[#fbe4f1] text-[#a5005c] text-xs font-bold tracking-wide px-3 py-1.5 uppercase self-start sm:self-center">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#e6007e]" />
+            Featured &middot; Exam &amp; Print Stationery
+          </span>
+          <div className="flex-1">
+            <p className="font-bold">
+              OMNI OMR Suite &mdash; the bubble sheet that grades itself
+            </p>
+            <p className="text-sm text-foreground/70 mt-0.5">
+              Print OMR answer sheets for NEET, JEE, SSC and other competitive exams, scan filled
+              sheets with a phone camera, and get ranked report cards automatically.{" "}
+              <span className="line-through text-foreground/40">Rs. 14,999</span>{" "}
+              <span className="font-semibold text-[#a5005c]">Rs. 4,999 prelaunch offer</span> &mdash;
+              ends Launch Day, 1 Aug 2026.
+            </p>
+          </div>
+          <span className="shrink-0 font-semibold text-sm text-[#a5005c] group-hover:underline whitespace-nowrap">
+            See the launch page &rarr;
+          </span>
+        </a>
+      </section>
+
       <section className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {roleCards.map((c) => (
