@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // Deliberately not nonce-based: nonces would force every page to dynamic
 // rendering, and Next.js's own hydration/inline styles need 'unsafe-inline'
@@ -13,7 +14,7 @@ const cspHeader = `
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob: https://*.public.blob.vercel-storage.com;
   font-src 'self';
-  connect-src 'self' https://*.razorpay.com;
+  connect-src 'self' https://*.razorpay.com https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://*.ingest.sentry.io;
   frame-src https://*.razorpay.com;
   object-src 'none';
   base-uri 'self';
@@ -55,4 +56,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Wraps the config to enable automatic Sentry instrumentation. Source-map
+// upload (org/project/authToken) only activates if SENTRY_AUTH_TOKEN is set
+// in the build environment; without it, this just skips the upload silently
+// and stack traces show minified code instead of the original source.
+// disableLogger/automaticVercelMonitors are deliberately omitted: both are
+// webpack-only and this project builds with Turbopack, so they're no-ops
+// here (and only trigger deprecation-warning noise in the dev log).
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: true,
+  widenClientFileUpload: true,
+});
