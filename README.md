@@ -162,3 +162,8 @@ See the deployment guide the assistant provided in-session, or in short:
    data.
 5. Deploy. Vercel runs `npm install` (which triggers `postinstall: prisma
    generate`) then `npm run build` automatically.
+
+If a push to `main` doesn't trigger a new deployment on its own, check
+Vercel project → Settings → Git that the GitHub integration is connected —
+without it, pushes land on GitHub but never build, and deploys have to be
+triggered manually (`vercel --prod`, or "Redeploy" in the dashboard).
