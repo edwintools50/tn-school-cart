@@ -19,13 +19,18 @@ async function upsertUser(data: {
   email: string;
   password: string;
   phone: string;
-  role: "PRINCIPAL" | "SUPPLIER" | "WORKER" | "ADMIN";
+  role: "PRINCIPAL" | "SUPPLIER" | "WORKER" | "TEACHER" | "COACHING_CENTRE" | "ADMIN";
   status?: "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
   schoolName?: string;
   udiseNumber?: string;
   district?: string;
   businessName?: string;
   serviceArea?: string;
+  qualification?: string;
+  subjectSpecialization?: string;
+  experienceYears?: number;
+  examsOffered?: string[];
+  coachingMode?: "OFFLINE" | "ONLINE" | "HYBRID";
 }) {
   const passwordHash = await hash(data.password);
   return db.user.upsert({
@@ -43,6 +48,11 @@ async function upsertUser(data: {
       district: data.district,
       businessName: data.businessName,
       serviceArea: data.serviceArea,
+      qualification: data.qualification,
+      subjectSpecialization: data.subjectSpecialization as never,
+      experienceYears: data.experienceYears,
+      examsOffered: data.examsOffered as never,
+      coachingMode: data.coachingMode,
     },
   });
 }
@@ -221,6 +231,43 @@ async function main() {
     serviceArea: "Chennai",
   });
 
+  const neetTeacher = await upsertUser({
+    name: "S. Divya",
+    email: "teacher.divya@tnschoolcart.in",
+    password: "teacher123",
+    phone: "9840044441",
+    role: "TEACHER",
+    qualification: "M.Sc. Zoology, B.Ed",
+    subjectSpecialization: "NEET_EXPERT_BIOLOGY",
+    experienceYears: 4,
+    serviceArea: "Madurai",
+  });
+
+  const neetCoachingCentre = await upsertUser({
+    name: "R. Vignesh",
+    email: "coaching.chennaineet@tnschoolcart.in",
+    password: "coaching123",
+    phone: "9840055551",
+    role: "COACHING_CENTRE",
+    businessName: "Chennai NEET & JEE Achievers Academy",
+    serviceArea: "Chennai",
+    examsOffered: ["NEET", "JEE_MAIN"],
+    coachingMode: "HYBRID",
+  });
+
+  const pendingCoachingCentre = await upsertUser({
+    name: "K. Bala",
+    email: "coaching.maduraitet@tnschoolcart.in",
+    password: "coaching123",
+    phone: "9840055552",
+    role: "COACHING_CENTRE",
+    status: "PENDING",
+    businessName: "Madurai TET Excellence Centre",
+    serviceArea: "Madurai",
+    examsOffered: ["TET"],
+    coachingMode: "OFFLINE",
+  });
+
   console.log("Users ready:", {
     admin: admin.email,
     stationerySupplier: stationerySupplier.email,
@@ -239,6 +286,9 @@ async function main() {
     painterWorker: painterWorker.email,
     cateringWorker: cateringWorker.email,
     transportWorker: transportWorker.email,
+    neetTeacher: neetTeacher.email,
+    neetCoachingCentre: neetCoachingCentre.email,
+    pendingCoachingCentre: pendingCoachingCentre.email,
   });
 
   const productSeed = [
@@ -673,6 +723,75 @@ async function main() {
   }
 
   console.log(`Seeded ${productSeed.length + 1} products and ${serviceSeed.length + 1} services.`);
+
+  // Job vacancies: one from a school (Principal), one from a Coaching Centre.
+  const neetJobVacancy = await (async () => {
+    const existing = await db.jobVacancy.findFirst({
+      where: { principalId: neetCoachingCentre.id, title: "NEET Biology Faculty (Batch 2027)" },
+    });
+    if (existing) return existing;
+    return db.jobVacancy.create({
+      data: {
+        principalId: neetCoachingCentre.id,
+        subject: "NEET_EXPERT_BIOLOGY",
+        title: "NEET Biology Faculty (Batch 2027)",
+        description:
+          "Teach Botany and Zoology to NEET UG aspirants (Class 11/12 + droppers). Weekend test analysis sessions included.",
+        schoolName: neetCoachingCentre.businessName!,
+        district: "Chennai",
+        taluk: "Egmore",
+        block: "Egmore",
+        pinCode: "600008",
+        address: "42 Pantheon Road, Egmore",
+        employmentType: "PART_TIME",
+        qualificationRequired: "M.Sc. Zoology/Botany with B.Ed preferred",
+        experienceRequired: "3+ years NEET coaching experience",
+        salaryRange: "₹25,000 - ₹40,000/month",
+        coachingMode: "HYBRID",
+      },
+    });
+  })();
+
+  const principalJobVacancy = await (async () => {
+    const existing = await db.jobVacancy.findFirst({
+      where: { principalId: principal2.id, title: "Primary Tamil Teacher (Classes 3-5)" },
+    });
+    if (existing) return existing;
+    return db.jobVacancy.create({
+      data: {
+        principalId: principal2.id,
+        subject: "PRIMARY_TEACHER",
+        title: "Primary Tamil Teacher (Classes 3-5)",
+        description: "Full-time primary section Tamil teacher for classes 3 to 5.",
+        schoolName: principal2.schoolName!,
+        udiseNumber: principal2.udiseNumber,
+        district: "Madurai",
+        taluk: "Madurai North",
+        block: "Anna Nagar",
+        pinCode: "625020",
+        address: "Anna Nagar, Madurai",
+        employmentType: "FULL_TIME",
+        qualificationRequired: "B.Ed with Tamil as a subject",
+        experienceRequired: "Freshers welcome",
+      },
+    });
+  })();
+
+  const teacherApplicationExisting = await db.jobApplication.findUnique({
+    where: { jobVacancyId_teacherId: { jobVacancyId: neetJobVacancy.id, teacherId: neetTeacher.id } },
+  });
+  if (!teacherApplicationExisting) {
+    await db.jobApplication.create({
+      data: {
+        jobVacancyId: neetJobVacancy.id,
+        teacherId: neetTeacher.id,
+        coverNote:
+          "4 years of NEET Biology coaching experience with a track record of students scoring 320+ in Biology.",
+      },
+    });
+  }
+
+  console.log("Seeded job vacancies:", { neetJobVacancy: neetJobVacancy.title, principalJobVacancy: principalJobVacancy.title });
   console.log("Done.");
 }
 

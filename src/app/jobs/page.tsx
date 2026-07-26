@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { TEACHING_SUBJECT_LABELS, TN_DISTRICTS, EMPLOYMENT_TYPE_LABELS } from "@/lib/constants";
+import {
+  TEACHING_SUBJECT_GROUPS,
+  TEACHING_SUBJECT_LABELS,
+  TN_DISTRICTS,
+  EMPLOYMENT_TYPE_LABELS,
+} from "@/lib/constants";
 import type { TeachingSubject } from "@/generated/prisma/enums";
 
 export default async function JobsPage({
@@ -26,7 +31,7 @@ export default async function JobsPage({
     <div className="mx-auto max-w-5xl px-4 py-8 w-full">
       <div className="flex items-center justify-between mb-1 flex-wrap gap-3">
         <h1 className="text-2xl font-bold">Teaching job vacancies</h1>
-        {user?.role === "PRINCIPAL" && (
+        {(user?.role === "PRINCIPAL" || user?.role === "COACHING_CENTRE") && (
           <Link
             href="/jobs/new"
             className="bg-brand text-white font-semibold rounded-md px-4 py-2 text-sm hover:bg-brand-dark"
@@ -36,7 +41,7 @@ export default async function JobsPage({
         )}
       </div>
       <p className="text-sm text-foreground/60 mb-6">
-        Teaching positions posted by schools across Tamil Nadu.
+        Teaching positions posted by schools and coaching centres across Tamil Nadu.
       </p>
 
       <form className="flex flex-wrap gap-3 mb-6" method="get">
@@ -46,10 +51,14 @@ export default async function JobsPage({
           className="rounded-md border border-border px-3 py-2 text-sm"
         >
           <option value="">All subjects</option>
-          {Object.entries(TEACHING_SUBJECT_LABELS).map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
+          {TEACHING_SUBJECT_GROUPS.map((group) => (
+            <optgroup key={group.label} label={group.label}>
+              {group.keys.map((key) => (
+                <option key={key} value={key}>
+                  {TEACHING_SUBJECT_LABELS[key]}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
         <select

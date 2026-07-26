@@ -3,9 +3,9 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireApprovedUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { TeachingSubject, EmploymentType, JobVacancyStatus } from "@/generated/prisma/enums";
+import { TeachingSubject, EmploymentType, JobVacancyStatus, CoachingMode } from "@/generated/prisma/enums";
 import { notifyJobApplicationReceived, notifyTeacherHired } from "@/lib/whatsapp-notify";
 
 export type ActionState = { error?: string } | undefined;
@@ -14,11 +14,10 @@ const jobVacancySchema = z.object({
   subject: z.enum(TeachingSubject),
   title: z.string().trim().min(3, "Title is required"),
   description: z.string().trim().min(10, "Please describe the role"),
-  schoolName: z.string().trim().min(2, "School name is required"),
-  udiseNumber: z
-    .string()
-    .trim()
-    .regex(/^\d{11}$/, "UDISE number must be the 11-digit school code"),
+  schoolName: z.string().trim().min(2, "School / coaching centre name is required"),
+  // Only a school (Principal) has a UDISE code — validated as required
+  // further down, conditional on the poster's actual role.
+  udiseNumber: z.string().trim().optional(),
   district: z.string().trim().min(2, "District is required"),
   taluk: z.string().trim().min(2, "Taluk is required"),
   block: z.string().trim().min(2, "Block is required"),
@@ -28,18 +27,26 @@ const jobVacancySchema = z.object({
   qualificationRequired: z.string().trim().min(2, "Required qualification is required"),
   experienceRequired: z.string().trim().min(1, "Required experience is required"),
   salaryRange: z.string().trim().optional(),
+  coachingMode: z.enum(CoachingMode).optional(),
 });
 
 export async function createJobVacancyAction(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireApprovedUser(["PRINCIPAL", "COACHING_CENTRE"]);
   const parsed = jobVacancySchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const data = parsed.data;
+
+  if (user.role === "PRINCIPAL" && !/^\d{11}$/.test(data.udiseNumber ?? "")) {
+    return { error: "UDISE number must be the 11-digit school code" };
+  }
+  if (user.role === "COACHING_CENTRE" && !data.coachingMode) {
+    return { error: "Select a mode for this batch" };
+  }
 
   const jobVacancy = await db.jobVacancy.create({
     data: {
@@ -48,7 +55,7 @@ export async function createJobVacancyAction(
       title: data.title,
       description: data.description,
       schoolName: data.schoolName,
-      udiseNumber: data.udiseNumber,
+      udiseNumber: user.role === "PRINCIPAL" ? data.udiseNumber : null,
       district: data.district,
       taluk: data.taluk,
       block: data.block,
@@ -58,6 +65,7 @@ export async function createJobVacancyAction(
       qualificationRequired: data.qualificationRequired,
       experienceRequired: data.experienceRequired,
       salaryRange: data.salaryRange || null,
+      coachingMode: user.role === "COACHING_CENTRE" ? data.coachingMode : null,
     },
   });
 
@@ -107,7 +115,7 @@ export async function submitApplicationAction(
 }
 
 export async function hireApplicationAction(formData: FormData) {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireApprovedUser(["PRINCIPAL", "COACHING_CENTRE"]);
   const applicationId = String(formData.get("applicationId"));
 
   const application = await db.jobApplication.findUnique({
@@ -141,7 +149,7 @@ const vacancyStatusTransitions: Record<string, string[]> = {
 };
 
 export async function updateJobVacancyStatusAction(formData: FormData) {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireApprovedUser(["PRINCIPAL", "COACHING_CENTRE"]);
   const jobVacancyId = String(formData.get("jobVacancyId"));
   const status = String(formData.get("status"));
 

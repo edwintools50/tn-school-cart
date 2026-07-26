@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { TEACHING_SUBJECT_LABELS } from "@/lib/constants";
+import { TEACHING_SUBJECT_LABELS, ROLE_LABELS } from "@/lib/constants";
 
 const statusColor: Record<string, string> = {
   OPEN: "bg-blue-100 text-blue-700",
@@ -33,8 +33,8 @@ export default async function AdminJobsPage() {
                 </span>
                 <p className="font-semibold">{job.title}</p>
                 <p className="text-xs text-foreground/50">
-                  {job.principal.name} &middot; {job.schoolName} ({job.district}) &middot;{" "}
-                  {job._count.applications} application(s)
+                  {job.principal.name} ({ROLE_LABELS[job.principal.role]}) &middot; {job.schoolName} (
+                  {job.district}) &middot; {job._count.applications} application(s)
                 </p>
               </div>
               <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColor[job.status]}`}>

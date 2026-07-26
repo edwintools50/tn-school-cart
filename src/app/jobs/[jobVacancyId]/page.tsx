@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { TEACHING_SUBJECT_LABELS, EMPLOYMENT_TYPE_LABELS } from "@/lib/constants";
+import { TEACHING_SUBJECT_LABELS, EMPLOYMENT_TYPE_LABELS, COACHING_MODE_LABELS } from "@/lib/constants";
 import JobApplicationForm from "@/components/JobApplicationForm";
 import { hireApplicationAction, updateJobVacancyStatusAction } from "../actions";
 
@@ -36,7 +36,9 @@ export default async function JobVacancyDetailPage({
 
   if (!jobVacancy) notFound();
 
-  const isOwner = user?.role === "PRINCIPAL" && user.id === jobVacancy.principalId;
+  const isOwner =
+    (user?.role === "PRINCIPAL" || user?.role === "COACHING_CENTRE") &&
+    user.id === jobVacancy.principalId;
   const myApplication = user?.role === "TEACHER"
     ? jobVacancy.applications.find((a) => a.teacherId === user.id)
     : undefined;
@@ -66,6 +68,7 @@ export default async function JobVacancyDetailPage({
       <p className="text-sm text-foreground/60 mb-6">
         Qualification: {jobVacancy.qualificationRequired} · Experience: {jobVacancy.experienceRequired}
         {jobVacancy.salaryRange ? ` · ${jobVacancy.salaryRange}` : ""}
+        {jobVacancy.coachingMode ? ` · ${COACHING_MODE_LABELS[jobVacancy.coachingMode]}` : ""}
       </p>
 
       <div className="card p-4 mb-6">

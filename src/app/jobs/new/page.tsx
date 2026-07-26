@@ -1,8 +1,8 @@
-import { requireUser } from "@/lib/auth";
+import { requireApprovedUser } from "@/lib/auth";
 import JobVacancyForm from "@/components/JobVacancyForm";
 
 export default async function NewJobVacancyPage() {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireApprovedUser(["PRINCIPAL", "COACHING_CENTRE"]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 w-full">
@@ -11,7 +11,10 @@ export default async function NewJobVacancyPage() {
         Describe the teaching role and interested teachers will apply.
       </p>
       <div className="card p-6">
-        <JobVacancyForm defaultUdiseNumber={user.udiseNumber ?? undefined} />
+        <JobVacancyForm
+          recruiterRole={user.role as "PRINCIPAL" | "COACHING_CENTRE"}
+          defaultUdiseNumber={user.udiseNumber ?? undefined}
+        />
       </div>
     </div>
   );

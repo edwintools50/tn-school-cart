@@ -3,7 +3,14 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { registerAction } from "../actions";
-import { TN_DISTRICTS, ROLE_LABELS, TEACHING_SUBJECT_LABELS } from "@/lib/constants";
+import {
+  TN_DISTRICTS,
+  ROLE_LABELS,
+  TEACHING_SUBJECT_GROUPS,
+  TEACHING_SUBJECT_LABELS,
+  COACHING_MODE_LABELS,
+  COMPETITIVE_EXAM_LABELS,
+} from "@/lib/constants";
 
 const inputClass =
   "w-full rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand";
@@ -11,18 +18,21 @@ const labelClass = "block text-sm font-medium mb-1";
 
 export default function RegisterPage() {
   const [state, formAction, pending] = useActionState(registerAction, undefined);
-  const [role, setRole] = useState<"PRINCIPAL" | "SUPPLIER" | "WORKER" | "TEACHER">("PRINCIPAL");
+  const [role, setRole] = useState<
+    "PRINCIPAL" | "SUPPLIER" | "WORKER" | "TEACHER" | "COACHING_CENTRE"
+  >("PRINCIPAL");
 
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-12">
       <div className="card w-full max-w-lg p-8">
         <h1 className="text-2xl font-bold mb-1">Create your account</h1>
         <p className="text-sm text-foreground/60 mb-6">
-          Join as a school buyer, a supplier, a gig worker, or a teacher looking for a job.
+          Join as a school buyer, a supplier, a gig worker, a teacher looking for a job, or a
+          coaching centre hiring teachers.
         </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-          {(["PRINCIPAL", "SUPPLIER", "WORKER", "TEACHER"] as const).map((r) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
+          {(["PRINCIPAL", "SUPPLIER", "WORKER", "TEACHER", "COACHING_CENTRE"] as const).map((r) => (
             <button
               key={r}
               type="button"
@@ -37,6 +47,7 @@ export default function RegisterPage() {
               {r === "SUPPLIER" && "Supplier (Seller)"}
               {r === "WORKER" && "Gig Worker"}
               {r === "TEACHER" && "Teacher"}
+              {r === "COACHING_CENTRE" && "Coaching Centre"}
             </button>
           ))}
         </div>
@@ -188,10 +199,14 @@ export default function RegisterPage() {
                   <option value="" disabled>
                     Select subject
                   </option>
-                  {Object.entries(TEACHING_SUBJECT_LABELS).map(([key, label]) => (
-                    <option key={key} value={key}>
-                      {label}
-                    </option>
+                  {TEACHING_SUBJECT_GROUPS.map((group) => (
+                    <optgroup key={group.label} label={group.label}>
+                      {group.keys.map((key) => (
+                        <option key={key} value={key}>
+                          {TEACHING_SUBJECT_LABELS[key]}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>
@@ -241,11 +256,89 @@ export default function RegisterPage() {
             </div>
           )}
 
+          {role === "COACHING_CENTRE" && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass} htmlFor="businessName">
+                    Coaching centre name
+                  </label>
+                  <input id="businessName" name="businessName" required className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass} htmlFor="serviceArea">
+                    District
+                  </label>
+                  <select id="serviceArea" name="serviceArea" required defaultValue="" className={inputClass}>
+                    <option value="" disabled>
+                      Select district
+                    </option>
+                    {TN_DISTRICTS.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Exams you coach for</label>
+                <div className="grid grid-cols-2 gap-2 rounded-md border border-border px-3 py-2">
+                  {Object.entries(COMPETITIVE_EXAM_LABELS).map(([key, label]) => (
+                    <label key={key} className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" name="examsOffered" value={key} />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-foreground/50 mt-1">Select all that apply.</p>
+              </div>
+
+              <div>
+                <label className={labelClass} htmlFor="coachingMode">
+                  Mode of coaching
+                </label>
+                <select id="coachingMode" name="coachingMode" required defaultValue="" className={inputClass}>
+                  <option value="" disabled>
+                    Select mode
+                  </option>
+                  {Object.entries(COACHING_MODE_LABELS).map(([key, label]) => (
+                    <option key={key} value={key}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={labelClass} htmlFor="centrePhoto">
+                  Centre photo (signboard/building, optional)
+                </label>
+                <input
+                  id="centrePhoto"
+                  name="centrePhoto"
+                  type="file"
+                  accept="image/*"
+                  className={inputClass}
+                />
+                <p className="text-xs text-foreground/50 mt-1">
+                  Helps our admin team verify your coaching centre faster.
+                </p>
+              </div>
+            </div>
+          )}
+
           {role !== "PRINCIPAL" && (
             <p className="text-xs text-foreground/60 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
               {ROLE_LABELS[role]} accounts are reviewed by the TN School Cart admin
-              team before you can {role === "TEACHER" ? "apply to job vacancies" : "publish listings"}.
-              You can still fill in your details while you wait.
+              team before you can{" "}
+              {role === "TEACHER"
+                ? "apply to job vacancies"
+                : role === "COACHING_CENTRE"
+                ? "post job vacancies"
+                : "publish listings"}
+              . You can still fill in your details while you wait.
             </p>
           )}
 

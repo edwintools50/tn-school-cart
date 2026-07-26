@@ -34,8 +34,8 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Demo accounts
 
 All seeded passwords are shown below. New accounts can also be created via
-**Sign up** — Principal accounts are auto-approved, Supplier/Worker accounts
-require admin approval (visible in `/admin/users`).
+**Sign up** — Principal accounts are auto-approved, Supplier/Worker/Teacher/
+Coaching Centre accounts require admin approval (visible in `/admin/users`).
 
 | Role | Email | Password |
 | --- | --- | --- |
@@ -56,6 +56,9 @@ require admin approval (visible in `/admin/users`).
 | Gig worker (Painting/Whitewashing) | worker.colortouch@tnschoolcart.in | worker123 |
 | Gig worker (Catering) | worker.annapoorna@tnschoolcart.in | worker123 |
 | Gig worker (Transport) | worker.safetransit@tnschoolcart.in | worker123 |
+| Teacher (NEET Biology expert) | teacher.divya@tnschoolcart.in | teacher123 |
+| Coaching Centre (NEET/JEE, approved) | coaching.chennaineet@tnschoolcart.in | coaching123 |
+| Coaching Centre (TET, pending approval) | coaching.maduraitet@tnschoolcart.in | coaching123 |
 
 ## Categories
 
@@ -72,6 +75,24 @@ Printer Support, RO Water Purifier Sales & Service, Smart Board/CCTV/
 Broadband Installation, Printing & Banner/Certificate Services, Catering
 (tea/snacks/lunch vendor supply), Student & Staff Commute Vehicle, Goods
 Transport/Carrier Service, Other.
+
+**Teaching jobs** (`/jobs`): posted by either a school (PRINCIPAL) or a
+COACHING_CENTRE recruiter — coaching centres hire faculty for competitive-exam
+preparation (NEET, JEE Main/Advanced, CUET, CLAT, TET, Bank/SSC/Railways).
+`TeachingSubject` in `prisma/schema.prisma` groups 60+ specializations into
+School Subjects, PG Teacher Specializations, NEET/JEE Coaching Experts, and
+TET Coaching Experts (see `TEACHING_SUBJECT_GROUPS` in `src/lib/constants.ts`
+for the `<optgroup>` grouping used in every subject `<select>`). A Coaching
+Centre's own profile records which exams it offers (`examsOffered`, a
+`CompetitiveExam[]`) and its general coaching mode (`coachingMode`); each
+individual job vacancy can also set its own `coachingMode` (Offline/Online/
+Hybrid) since one centre may run both online and in-person batches. Unlike a
+school's UDISE number, a coaching centre has no mandatory registration code,
+so `JobVacancy.udiseNumber` stays null for centre-posted vacancies. The
+`JobVacancy.principalId`/`principal` field/relation names were kept as-is
+(not renamed to something recruiter-neutral) to avoid a column rename against
+the live database — branch on `principal.role` wherever the poster's type
+matters.
 
 Anything that doesn't fit an existing category should go under **Other** —
 new dedicated categories can be added later the same way (extend the

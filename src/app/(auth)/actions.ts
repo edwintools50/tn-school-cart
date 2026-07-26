@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { createSession, destroySession } from "@/lib/session";
-import { Role, TeachingSubject } from "@/generated/prisma/enums";
+import { Role, TeachingSubject, CoachingMode, CompetitiveExam } from "@/generated/prisma/enums";
 import { uploadPhoto, uploadDocument } from "@/lib/blob";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { getClientIp } from "@/lib/request-ip";
@@ -58,6 +58,14 @@ const registerSchema = z.discriminatedUnion("role", [
     experienceYears: z.coerce.number().int().min(0, "Experience can't be negative"),
     serviceArea: z.string().trim().min(2, "Preferred district is required"),
   }),
+  z.object({
+    role: z.literal(Role.COACHING_CENTRE),
+    ...baseSchema,
+    businessName: z.string().trim().min(2, "Coaching centre name is required"),
+    serviceArea: z.string().trim().min(2, "District is required"),
+    examsOffered: z.array(z.enum(CompetitiveExam)).min(1, "Select at least one exam you coach for"),
+    coachingMode: z.enum(CoachingMode),
+  }),
 ]);
 
 function redirectForRole(role: string): never {
@@ -65,6 +73,7 @@ function redirectForRole(role: string): never {
   if (role === Role.SUPPLIER) redirect("/dashboard/supplier");
   if (role === Role.WORKER) redirect("/dashboard/worker");
   if (role === Role.TEACHER) redirect("/dashboard/teacher");
+  if (role === Role.COACHING_CENTRE) redirect("/jobs/mine");
   redirect("/marketplace");
 }
 
@@ -79,7 +88,13 @@ export async function registerAction(
     return { error: `Too many accounts created from this connection. Try again in ${minutes} minute(s).` };
   }
 
-  const raw = Object.fromEntries(formData.entries());
+  const raw: Record<string, unknown> = Object.fromEntries(formData.entries());
+  // Coaching Centre "exams offered" is a checkbox group — multiple entries
+  // share the same form field name, so Object.fromEntries above would only
+  // keep the last one. Pull the full list explicitly for that role.
+  if (raw.role === Role.COACHING_CENTRE) {
+    raw.examsOffered = formData.getAll("examsOffered");
+  }
   const parsed = registerSchema.safeParse(raw);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
@@ -98,6 +113,14 @@ export async function registerAction(
     const schoolPhoto = formData.get("schoolPhoto") as File | null;
     try {
       verificationPhotoUrl = await uploadPhoto(schoolPhoto, "school-verification");
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Photo upload failed." };
+    }
+  }
+  if (data.role === Role.COACHING_CENTRE) {
+    const centrePhoto = formData.get("centrePhoto") as File | null;
+    try {
+      verificationPhotoUrl = await uploadPhoto(centrePhoto, "coaching-centre-verification");
     } catch (e) {
       return { error: e instanceof Error ? e.message : "Photo upload failed." };
     }
@@ -126,17 +149,22 @@ export async function registerAction(
       district: data.role === Role.PRINCIPAL ? data.district : undefined,
       verificationPhotoUrl,
       businessName:
-        data.role === Role.SUPPLIER || data.role === Role.WORKER
+        data.role === Role.SUPPLIER || data.role === Role.WORKER || data.role === Role.COACHING_CENTRE
           ? data.businessName
           : undefined,
       serviceArea:
-        data.role === Role.SUPPLIER || data.role === Role.WORKER || data.role === Role.TEACHER
+        data.role === Role.SUPPLIER ||
+        data.role === Role.WORKER ||
+        data.role === Role.TEACHER ||
+        data.role === Role.COACHING_CENTRE
           ? data.serviceArea
           : undefined,
       qualification: data.role === Role.TEACHER ? data.qualification : undefined,
       subjectSpecialization: data.role === Role.TEACHER ? data.subjectSpecialization : undefined,
       experienceYears: data.role === Role.TEACHER ? data.experienceYears : undefined,
       resumeUrl,
+      examsOffered: data.role === Role.COACHING_CENTRE ? data.examsOffered : undefined,
+      coachingMode: data.role === Role.COACHING_CENTRE ? data.coachingMode : undefined,
     },
   });
 

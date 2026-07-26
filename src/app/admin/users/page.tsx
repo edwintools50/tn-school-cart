@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { ROLE_LABELS, TEACHING_SUBJECT_LABELS } from "@/lib/constants";
+import { ROLE_LABELS, TEACHING_SUBJECT_LABELS, COMPETITIVE_EXAM_LABELS, COACHING_MODE_LABELS } from "@/lib/constants";
 import {
   approveUserAction,
   rejectUserAction,
@@ -27,7 +27,7 @@ export default async function AdminUsersPage({
     where: {
       role: { not: "ADMIN" },
       ...(status ? { status: status as "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED" } : {}),
-      ...(role ? { role: role as "PRINCIPAL" | "SUPPLIER" | "WORKER" | "TEACHER" } : {}),
+      ...(role ? { role: role as "PRINCIPAL" | "SUPPLIER" | "WORKER" | "TEACHER" | "COACHING_CENTRE" } : {}),
     },
     orderBy: { createdAt: "desc" },
   });
@@ -50,6 +50,7 @@ export default async function AdminUsersPage({
           <option value="SUPPLIER">Supplier</option>
           <option value="WORKER">Gig Worker</option>
           <option value="TEACHER">Teacher</option>
+          <option value="COACHING_CENTRE">Coaching Centre</option>
         </select>
         <button type="submit" className="bg-brand text-white text-sm font-semibold rounded-md px-4 py-2 hover:bg-brand-dark">
           Filter
@@ -67,7 +68,7 @@ export default async function AdminUsersPage({
                   <a href={u.verificationPhotoUrl} target="_blank" rel="noopener noreferrer">
                     <img
                       src={u.verificationPhotoUrl}
-                      alt="School verification photo"
+                      alt="Verification photo"
                       className="h-14 w-14 object-cover rounded-md border border-border"
                     />
                   </a>
@@ -84,6 +85,14 @@ export default async function AdminUsersPage({
                       ? `${u.schoolName}, ${u.district}`
                       : u.role === "TEACHER"
                       ? `${u.qualification}${u.subjectSpecialization ? `, ${TEACHING_SUBJECT_LABELS[u.subjectSpecialization]}` : ""}, ${u.serviceArea}`
+                      : u.role === "COACHING_CENTRE"
+                      ? `${u.businessName}, ${u.serviceArea}${
+                          u.coachingMode ? ` · ${COACHING_MODE_LABELS[u.coachingMode]}` : ""
+                        }${
+                          u.examsOffered.length
+                            ? ` · ${u.examsOffered.map((e) => COMPETITIVE_EXAM_LABELS[e]).join(", ")}`
+                            : ""
+                        }`
                       : `${u.businessName}, ${u.serviceArea}`}
                   </p>
                   {u.role === "TEACHER" && u.resumeUrl && (

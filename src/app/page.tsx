@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { PRODUCT_CATEGORY_LABELS, GIG_CATEGORY_LABELS, TEACHING_SUBJECT_LABELS } from "@/lib/constants";
+import {
+  PRODUCT_CATEGORY_LABELS,
+  GIG_CATEGORY_LABELS,
+  TEACHING_SUBJECT_LABELS,
+  POPULAR_TEACHING_SUBJECTS,
+} from "@/lib/constants";
 
 const roleCards = [
   {
@@ -25,10 +30,17 @@ const roleCards = [
   },
   {
     title: "Teachers",
-    body: "Apply to teaching job vacancies posted by schools across Tamil Nadu — browse openings by subject and district.",
+    body: "Apply to teaching job vacancies posted by schools and coaching centres across Tamil Nadu — browse openings by subject and district.",
     cta: "Apply for jobs",
     href: "/register",
     accent: "border-t-purple-600",
+  },
+  {
+    title: "Coaching Centres",
+    body: "Post job vacancies for NEET, JEE, CUET, CLAT and other competitive-exam faculty, and hire qualified, experienced teachers from across Tamil Nadu.",
+    cta: "Hire teaching faculty",
+    href: "/register",
+    accent: "border-t-amber-600",
   },
 ];
 
@@ -94,7 +106,7 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-12">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {roleCards.map((c) => (
             <div key={c.title} className={`card border-t-4 ${c.accent} p-6 flex flex-col gap-3`}>
               <h3 className="font-bold text-lg">{c.title}</h3>
@@ -144,18 +156,23 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-xl font-bold mb-4">Teaching subjects in demand</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {Object.entries(TEACHING_SUBJECT_LABELS)
-            .filter(([key]) => key !== "OTHER")
-            .map(([key, label]) => (
-              <Link
-                key={key}
-                href={`/jobs?subject=${key}`}
-                className="card p-4 text-sm font-medium hover:border-purple-600 transition-colors text-center"
-              >
-                {label}
-              </Link>
-            ))}
+          {POPULAR_TEACHING_SUBJECTS.map((key) => (
+            <Link
+              key={key}
+              href={`/jobs?subject=${key}`}
+              className="card p-4 text-sm font-medium hover:border-purple-600 transition-colors text-center"
+            >
+              {TEACHING_SUBJECT_LABELS[key]}
+            </Link>
+          ))}
         </div>
+        <p className="text-xs text-foreground/50 mt-3">
+          Plus 45+ more PG Teacher, NEET/JEE and TET coaching specializations —{" "}
+          <Link href="/jobs" className="text-brand font-medium hover:underline">
+            see all open vacancies
+          </Link>
+          .
+        </p>
       </section>
     </div>
   );

@@ -2,18 +2,27 @@
 
 import { useActionState } from "react";
 import { createJobVacancyAction } from "@/app/jobs/actions";
-import { TEACHING_SUBJECT_LABELS, EMPLOYMENT_TYPE_LABELS, TN_DISTRICTS } from "@/lib/constants";
+import {
+  TEACHING_SUBJECT_GROUPS,
+  TEACHING_SUBJECT_LABELS,
+  EMPLOYMENT_TYPE_LABELS,
+  COACHING_MODE_LABELS,
+  TN_DISTRICTS,
+} from "@/lib/constants";
 
 const inputClass =
   "w-full rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand";
 const labelClass = "block text-sm font-medium mb-1";
 
 export default function JobVacancyForm({
+  recruiterRole,
   defaultUdiseNumber,
 }: {
+  recruiterRole: "PRINCIPAL" | "COACHING_CENTRE";
   defaultUdiseNumber?: string;
 }) {
   const [state, formAction, pending] = useActionState(createJobVacancyAction, undefined);
+  const isCoachingCentre = recruiterRole === "COACHING_CENTRE";
 
   return (
     <form action={formAction} className="space-y-4">
@@ -25,10 +34,14 @@ export default function JobVacancyForm({
           <option value="" disabled>
             Select subject
           </option>
-          {Object.entries(TEACHING_SUBJECT_LABELS).map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
+          {TEACHING_SUBJECT_GROUPS.map((group) => (
+            <optgroup key={group.label} label={group.label}>
+              {group.keys.map((key) => (
+                <option key={key} value={key}>
+                  {TEACHING_SUBJECT_LABELS[key]}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </div>
@@ -63,26 +76,44 @@ export default function JobVacancyForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelClass} htmlFor="schoolName">
-            School name
+            {isCoachingCentre ? "Coaching centre name" : "School name"}
           </label>
           <input id="schoolName" name="schoolName" required className={inputClass} />
         </div>
-        <div>
-          <label className={labelClass} htmlFor="udiseNumber">
-            UDISE number
-          </label>
-          <input
-            id="udiseNumber"
-            name="udiseNumber"
-            inputMode="numeric"
-            pattern="\d{11}"
-            maxLength={11}
-            placeholder="11-digit code"
-            defaultValue={defaultUdiseNumber ?? ""}
-            required
-            className={inputClass}
-          />
-        </div>
+        {isCoachingCentre ? (
+          <div>
+            <label className={labelClass} htmlFor="coachingMode">
+              Mode for this batch
+            </label>
+            <select id="coachingMode" name="coachingMode" required defaultValue="" className={inputClass}>
+              <option value="" disabled>
+                Select mode
+              </option>
+              {Object.entries(COACHING_MODE_LABELS).map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div>
+            <label className={labelClass} htmlFor="udiseNumber">
+              UDISE number
+            </label>
+            <input
+              id="udiseNumber"
+              name="udiseNumber"
+              inputMode="numeric"
+              pattern="\d{11}"
+              maxLength={11}
+              placeholder="11-digit code"
+              defaultValue={defaultUdiseNumber ?? ""}
+              required
+              className={inputClass}
+            />
+          </div>
+        )}
       </div>
 
       <div>
@@ -130,7 +161,7 @@ export default function JobVacancyForm({
 
       <div>
         <label className={labelClass} htmlFor="address">
-          School address
+          {isCoachingCentre ? "Centre address" : "School address"}
         </label>
         <input id="address" name="address" required className={inputClass} />
       </div>

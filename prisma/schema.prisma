@@ -14,6 +14,7 @@ enum Role {
   SUPPLIER
   WORKER
   TEACHER
+  COACHING_CENTRE
   ADMIN
 }
 
@@ -30,6 +31,77 @@ enum TeachingSubject {
   PRIMARY_TEACHER
   SPECIAL_EDUCATOR
   LIBRARIAN
+  // PG Teacher (postgraduate subject) specializations
+  PG_TAMIL
+  PG_SPECIAL_TAMIL
+  PG_ENGLISH
+  PG_HINDI
+  PG_ARABIC
+  PG_FRENCH
+  PG_MATHS
+  PG_PHYSICS
+  PG_CHEMISTRY
+  PG_BIOLOGY
+  PG_BOTANY
+  PG_ZOOLOGY
+  PG_BIO_CHEMISTRY
+  PG_MICRO_BIOLOGY
+  PG_ACCOUNTANCY
+  PG_COMMERCE
+  PG_HISTORY
+  PG_ECONOMICS
+  PG_BUSINESS_MATHS
+  PG_STATISTICS
+  PG_COMPUTER_SCIENCE
+  PG_POLITICAL_SCIENCE
+  PG_NURSING
+  PG_PSYCHOLOGY
+  PG_SOCIOLOGY
+  PG_VOCATIONAL_OFFICE_MANAGEMENT
+  PG_VOCATIONAL_GENERAL_NURSING
+  PG_VOCATIONAL_NUTRITION_DIETETICS
+  PG_VOCATIONAL_BASIC_ENGINEERING
+  PG_VOCATIONAL_TEXTILE_TECHNOLOGY
+  // Competitive-exam coaching experts
+  NEET_EXPERT_BIOLOGY
+  NEET_EXPERT_BOTANY
+  NEET_EXPERT_PHYSICS
+  NEET_EXPERT_CHEMISTRY
+  NEET_EXPERT_ZOOLOGY
+  JEE_MAIN_EXPERT_PHYSICS
+  JEE_MAIN_EXPERT_CHEMISTRY
+  JEE_MAIN_EXPERT_MATHS
+  JEE_ADVANCED_EXPERT_PHYSICS
+  JEE_ADVANCED_EXPERT_CHEMISTRY
+  JEE_ADVANCED_EXPERT_MATHS
+  // TET (Teacher Eligibility Test) coaching experts
+  TET_PAPER_I_EXPERT_TAMIL
+  TET_PAPER_I_EXPERT_ENGLISH
+  TET_PAPER_I_EXPERT_MATHS
+  TET_PAPER_I_EXPERT_SCIENCE
+  TET_PAPER_I_EXPERT_SOCIAL
+  TET_PAPER_II_EXPERT_TAMIL
+  TET_PAPER_II_EXPERT_ENGLISH
+  TET_PAPER_II_EXPERT_MATHS
+  TET_PAPER_II_EXPERT_SCIENCE
+  TET_PAPER_II_EXPERT_SOCIAL
+  OTHER
+}
+
+enum CoachingMode {
+  OFFLINE
+  ONLINE
+  HYBRID
+}
+
+enum CompetitiveExam {
+  NEET
+  JEE_MAIN
+  JEE_ADVANCED
+  CUET
+  CLAT
+  TET
+  BANK_SSC_RAILWAYS
   OTHER
 }
 
@@ -144,6 +216,10 @@ model User {
   subjectSpecialization TeachingSubject?
   experienceYears        Int?
   resumeUrl              String?
+  // Coaching Centre fields (businessName = centre name, serviceArea = district,
+  // verificationPhotoUrl = centre photo, all reused from the fields above)
+  examsOffered   CompetitiveExam[] @default([])
+  coachingMode   CoachingMode?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
@@ -286,6 +362,9 @@ model GigOffer {
 
 model JobVacancy {
   id                    String             @id @default(cuid())
+  // Despite the field name, the poster is either a PRINCIPAL (school) or a
+  // COACHING_CENTRE recruiter — kept as "principal" to avoid a column rename
+  // on a live database; branch on `principal.role` when it matters.
   principalId           String
   principal             User               @relation("PrincipalJobVacancies", fields: [principalId], references: [id], onDelete: Cascade)
   subject               TeachingSubject
@@ -302,6 +381,9 @@ model JobVacancy {
   qualificationRequired String
   experienceRequired    String
   salaryRange           String?
+  // Set only for COACHING_CENTRE-posted vacancies (a specific batch's mode);
+  // null for school vacancies, which are implicitly in-person.
+  coachingMode          CoachingMode?
   status                JobVacancyStatus   @default(OPEN)
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt

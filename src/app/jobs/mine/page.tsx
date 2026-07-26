@@ -10,7 +10,7 @@ const statusColor: Record<string, string> = {
 };
 
 export default async function MyJobVacanciesPage() {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(["PRINCIPAL", "COACHING_CENTRE"]);
 
   const jobVacancies = await db.jobVacancy.findMany({
     where: { principalId: user.id },
