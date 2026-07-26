@@ -66,7 +66,7 @@ export default function Home() {
 
       <section className="mx-auto max-w-6xl px-4 pt-10">
         <a
-          href="https://claude.ai/code/artifact/d949175d-a593-4836-bc0e-6c36a91b8ba3"
+          href="/omni-omr-suite.html"
           target="_blank"
           rel="noopener noreferrer"
           className="card flex flex-col sm:flex-row sm:items-center gap-4 p-5 sm:p-6 hover:border-[#e6007e]/60 transition-colors group"
