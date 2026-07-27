@@ -2,7 +2,7 @@ import { whatsappLink } from "@/lib/whatsapp";
 
 export default function WhatsAppBubble() {
   const href = whatsappLink(
-    "Hi TN School Cart, I'd like help with an order/request."
+    "Hi TN School Cart! 👋 I have a quick question — could someone help me out?"
   );
 
   return (
