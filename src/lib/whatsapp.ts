@@ -1,4 +1,4 @@
-export const WHATSAPP_BUSINESS_NUMBER = "919943980008";
+export const WHATSAPP_BUSINESS_NUMBER = "919943080009";
 
 export function whatsappLink(message: string) {
   const params = new URLSearchParams({ text: message });
