@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import WhatsAppBubble from "@/components/WhatsAppBubble";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,6 +22,12 @@ export const metadata: Metadata = {
     "The Edu-commerce marketplace connecting Tamil Nadu school principals /HMs with trusted suppliers and gig workers.",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#145c9e",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,6 +43,7 @@ export default function RootLayout({
         <main className="flex-1 flex flex-col">{children}</main>
         <Footer />
         <WhatsAppBubble />
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

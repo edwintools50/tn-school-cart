@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.tnschoolcart.app",
+      "sha256_cert_fingerprints": [
+        "2C:3C:1A:68:A4:DD:63:E0:B3:A3:36:4D:E6:81:9C:07:93:DB:9C:1B:C8:42:F5:F6:03:E2:5C:BC:10:9F:ED:A0",
+        "REPLACE_WITH_YOUR_RELEASE_SHA256_FINGERPRINT_BEFORE_PLAY_STORE_SUBMISSION"
+      ]
+    }
+  }
+]
