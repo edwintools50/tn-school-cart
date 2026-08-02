@@ -3,9 +3,18 @@ import Image from "next/image";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { logoutAction } from "@/app/(auth)/actions";
+import MobileNav from "@/components/MobileNav";
+import {
+  Store,
+  Wrench,
+  ClipboardList,
+  Briefcase,
+  ShoppingCart,
+  LayoutDashboard,
+} from "lucide-react";
 
 const linkClass =
-  "text-sm font-medium text-foreground/80 hover:text-brand transition-colors";
+  "flex items-center gap-1.5 text-sm font-medium text-foreground/80 hover:text-brand transition-colors";
 
 export default async function Nav() {
   const user = await getCurrentUser();
@@ -31,17 +40,21 @@ export default async function Nav() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-5 flex-wrap justify-end">
+        <nav className="hidden md:flex items-center gap-5 flex-wrap justify-end">
           <Link href="/marketplace" className={linkClass}>
+            <Store size={16} />
             Marketplace
           </Link>
           <Link href="/services" className={linkClass}>
+            <Wrench size={16} />
             Find Services
           </Link>
           <Link href="/gigs" className={linkClass}>
+            <ClipboardList size={16} />
             Gig Requests
           </Link>
           <Link href="/jobs" className={linkClass}>
+            <Briefcase size={16} />
             Job Vacancies
           </Link>
 
@@ -71,6 +84,7 @@ export default async function Nav() {
                 My Orders
               </Link>
               <Link href="/cart" className={`${linkClass} relative`}>
+                <ShoppingCart size={16} />
                 Cart
                 {cartCount > 0 && (
                   <span className="ml-1 inline-flex items-center justify-center bg-accent text-white text-xs rounded-full h-5 min-w-5 px-1">
@@ -83,24 +97,28 @@ export default async function Nav() {
 
           {user?.role === "SUPPLIER" && (
             <Link href="/dashboard/supplier" className={linkClass}>
+              <LayoutDashboard size={16} />
               Supplier Dashboard
             </Link>
           )}
 
           {user?.role === "WORKER" && (
             <Link href="/dashboard/worker" className={linkClass}>
+              <LayoutDashboard size={16} />
               Worker Dashboard
             </Link>
           )}
 
           {user?.role === "TEACHER" && (
             <Link href="/dashboard/teacher" className={linkClass}>
+              <LayoutDashboard size={16} />
               Teacher Dashboard
             </Link>
           )}
 
           {user?.role === "ADMIN" && (
             <Link href="/admin" className={linkClass}>
+              <LayoutDashboard size={16} />
               Admin
             </Link>
           )}
@@ -129,6 +147,12 @@ export default async function Nav() {
             </div>
           )}
         </nav>
+
+        <MobileNav
+          user={user ? { name: user.name, role: user.role, status: user.status } : null}
+          cartCount={cartCount}
+          logoutAction={logoutAction}
+        />
       </div>
     </header>
   );

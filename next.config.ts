@@ -20,12 +20,17 @@ const cspHeader = `
   base-uri 'self';
   form-action 'self';
   frame-ancestors 'none';
-  upgrade-insecure-requests;
+  ${isDev ? "" : "upgrade-insecure-requests;"}
 `
   .replace(/\s{2,}/g, " ")
   .trim();
 
 const nextConfig: NextConfig = {
+  // Lets a phone on the same LAN load dev assets (JS/CSS chunks) when hitting
+  // the dev server's network URL instead of localhost — Next.js blocks
+  // cross-origin dev requests by default since 15.3 to prevent DNS rebinding.
+  // Dev-only; has no effect on production builds.
+  allowedDevOrigins: ["10.240.184.226"],
   experimental: {
     // Default is 1MB, too small for digital-product/resume/photo uploads.
     // Kept under Vercel's ~4.5MB serverless function request body ceiling.

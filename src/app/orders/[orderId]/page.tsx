@@ -1,4 +1,16 @@
 import { notFound } from "next/navigation";
+import {
+  MessageCircle,
+  MapPin,
+  Sparkles,
+  Download,
+  CreditCard,
+  Clock,
+  Truck,
+  CheckCircle2,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -10,6 +22,14 @@ const statusColor: Record<string, string> = {
   SHIPPED: "bg-amber-100 text-amber-700",
   DELIVERED: "bg-green-100 text-green-700",
   CANCELLED: "bg-red-100 text-red-700",
+};
+
+const statusIcon: Record<string, LucideIcon> = {
+  PLACED: Clock,
+  CONFIRMED: CheckCircle2,
+  SHIPPED: Truck,
+  DELIVERED: CheckCircle2,
+  CANCELLED: XCircle,
 };
 
 export default async function OrderDetailPage({
@@ -34,15 +54,16 @@ export default async function OrderDetailPage({
   );
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 w-full">
-      <div className="flex items-start justify-between gap-4 flex-wrap mb-1">
-        <h1 className="text-2xl font-bold">Order #{order.id.slice(-8)}</h1>
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:py-8 w-full">
+      <div className="flex items-start justify-between gap-3 flex-wrap mb-1">
+        <h1 className="text-xl sm:text-2xl font-bold">Order #{order.id.slice(-8)}</h1>
         <a
           href={whatsappHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-[#25D366] text-white text-sm font-semibold rounded-md px-3 py-1.5 hover:brightness-95 transition"
+          className="inline-flex items-center gap-2 bg-[#25D366] text-white text-xs sm:text-sm font-semibold rounded-full px-3 py-1.5 hover:brightness-95 transition"
         >
+          <MessageCircle size={14} />
           Chat on WhatsApp
         </a>
       </div>
@@ -51,8 +72,11 @@ export default async function OrderDetailPage({
       </p>
 
       {!allDigital && (
-        <div className="card p-4 mb-6">
-          <h2 className="font-semibold mb-2">Delivery to</h2>
+        <div className="card p-4 mb-4 rounded-2xl">
+          <h2 className="flex items-center gap-1.5 font-semibold mb-2">
+            <MapPin size={16} className="text-brand" />
+            Delivery to
+          </h2>
           <p className="text-sm">{order.shippingSchool}</p>
           {order.shippingUdise && (
             <p className="text-xs text-foreground/50">UDISE: {order.shippingUdise}</p>
@@ -67,54 +91,63 @@ export default async function OrderDetailPage({
         </div>
       )}
 
-      <div className="card divide-y divide-border mb-6">
-        {order.items.map((item) => (
-          <div key={item.id} className="p-4 flex items-center justify-between gap-4">
-            <div>
-              <p className="font-semibold">
-                {item.titleAtOrder}
-                {item.product.isDigital && (
-                  <span className="ml-2 text-xs font-semibold text-brand bg-brand/10 rounded-full px-2 py-0.5 align-middle">
-                    Digital
-                  </span>
+      <div className="card divide-y divide-border mb-4 rounded-2xl overflow-hidden">
+        {order.items.map((item) => {
+          const StatusIcon = statusIcon[item.status];
+          return (
+            <div key={item.id} className="p-4 flex items-start justify-between gap-3 flex-wrap">
+              <div className="min-w-0">
+                <p className="font-semibold text-sm flex items-center gap-1.5 flex-wrap">
+                  {item.titleAtOrder}
+                  {item.product.isDigital && (
+                    <span className="flex items-center gap-0.5 text-[10px] font-semibold text-brand bg-brand/10 rounded-full px-1.5 py-0.5">
+                      <Sparkles size={10} />
+                      Digital
+                    </span>
+                  )}
+                </p>
+                <p className="text-xs text-foreground/50 mt-0.5">
+                  Sold by {item.supplier.businessName ?? item.supplier.name} &middot;{" "}
+                  {item.quantity} &times; &#8377;{item.priceAtOrder.toFixed(2)}
+                </p>
+                {order.paid && item.product.isDigital && item.product.fileUrl && (
+                  <a
+                    href={`/api/downloads/${item.productId}`}
+                    target="_blank"
+                    rel="noopener"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline mt-1"
+                  >
+                    <Download size={12} />
+                    Download
+                  </a>
                 )}
-              </p>
-              <p className="text-xs text-foreground/50">
-                Sold by {item.supplier.businessName ?? item.supplier.name} &middot;{" "}
-                {item.quantity} &times; &#8377;{item.priceAtOrder.toFixed(2)}
-              </p>
-              {order.paid && item.product.isDigital && item.product.fileUrl && (
-                <a
-                  href={`/api/downloads/${item.productId}`}
-                  target="_blank"
-                  rel="noopener"
-                  className="text-xs font-semibold text-brand hover:underline"
+              </div>
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span className="font-semibold text-sm text-brand-dark">
+                  &#8377;{(item.priceAtOrder * item.quantity).toFixed(2)}
+                </span>
+                <span
+                  className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full ${statusColor[item.status]}`}
                 >
-                  Download &rarr;
-                </a>
-              )}
+                  {StatusIcon && <StatusIcon size={11} />}
+                  {item.status}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="font-semibold">
-                &#8377;{(item.priceAtOrder * item.quantity).toFixed(2)}
-              </span>
-              <span
-                className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColor[item.status]}`}
-              >
-                {item.status}
-              </span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
         <div className="p-4 flex justify-between font-bold">
           <span>Total {order.paid && <span className="text-accent font-normal text-xs">(Paid)</span>}</span>
-          <span>&#8377;{order.totalAmount.toFixed(2)}</span>
+          <span className="text-brand-dark">&#8377;{order.totalAmount.toFixed(2)}</span>
         </div>
       </div>
 
       {!order.paid && order.razorpayOrderId && process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID && (
-        <div className="card p-4 mb-6">
-          <h2 className="font-semibold mb-3">Complete payment</h2>
+        <div className="card p-4 mb-6 rounded-2xl">
+          <h2 className="flex items-center gap-1.5 font-semibold mb-3">
+            <CreditCard size={16} className="text-brand" />
+            Complete payment
+          </h2>
           <RazorpayPayButton
             orderId={order.id}
             razorpayOrderId={order.razorpayOrderId}

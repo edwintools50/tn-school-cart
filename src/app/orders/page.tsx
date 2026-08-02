@@ -1,4 +1,13 @@
 import Link from "next/link";
+import {
+  PackageSearch,
+  Package,
+  Clock,
+  Truck,
+  CheckCircle2,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 
@@ -8,6 +17,14 @@ const statusColor: Record<string, string> = {
   SHIPPED: "bg-amber-100 text-amber-700",
   DELIVERED: "bg-green-100 text-green-700",
   CANCELLED: "bg-red-100 text-red-700",
+};
+
+const statusIcon: Record<string, LucideIcon> = {
+  PLACED: Clock,
+  CONFIRMED: CheckCircle2,
+  SHIPPED: Truck,
+  DELIVERED: CheckCircle2,
+  CANCELLED: XCircle,
 };
 
 export default async function OrdersPage() {
@@ -20,11 +37,15 @@ export default async function OrdersPage() {
   });
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 w-full">
-      <h1 className="text-2xl font-bold mb-6">My orders</h1>
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:py-8 w-full">
+      <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-bold mb-6">
+        <Package size={22} className="text-brand" />
+        My orders
+      </h1>
 
       {orders.length === 0 ? (
-        <div className="card p-8 text-center">
+        <div className="card p-8 flex flex-col items-center text-center rounded-2xl">
+          <PackageSearch size={36} className="mb-3 text-foreground/30" />
           <p className="text-sm text-foreground/60 mb-4">You haven&apos;t placed any orders yet.</p>
           <Link href="/marketplace" className="text-brand font-semibold hover:underline">
             Browse the marketplace &rarr;
@@ -40,25 +61,29 @@ export default async function OrdersPage() {
                   ? "CANCELLED"
                   : "PLACED"
                 : order.items[0]?.status ?? "PLACED";
+            const StatusIcon = statusIcon[overallStatus];
 
             return (
               <Link
                 key={order.id}
                 href={`/orders/${order.id}`}
-                className="card p-4 flex items-center justify-between hover:border-brand transition-colors"
+                className="card p-4 rounded-2xl flex items-center justify-between gap-3 hover:border-brand hover:shadow-sm transition-all"
               >
-                <div>
-                  <p className="font-semibold">Order #{order.id.slice(-8)}</p>
-                  <p className="text-xs text-foreground/50">
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm">Order #{order.id.slice(-8)}</p>
+                  <p className="text-xs text-foreground/50 mt-0.5">
                     {order.items.length} item(s) &middot;{" "}
                     {new Date(order.createdAt).toLocaleDateString("en-IN")}
                   </p>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-bold">&#8377;{order.totalAmount.toFixed(2)}</span>
+                <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                  <span className="font-bold text-brand-dark text-sm sm:text-base">
+                    &#8377;{order.totalAmount.toFixed(2)}
+                  </span>
                   <span
-                    className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColor[overallStatus]}`}
+                    className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full ${statusColor[overallStatus]}`}
                   >
+                    {StatusIcon && <StatusIcon size={11} />}
                     {overallStatus}
                   </span>
                 </div>
