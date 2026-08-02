@@ -80,6 +80,33 @@ export default function OmrDownloadPage() {
       </div>
 
       <div className="mt-12">
+        <h2 className="text-lg font-bold mb-1 text-center sm:text-left">See it running</h2>
+        <p className="text-sm text-foreground/60 mb-6 text-center sm:text-left">
+          Real screenshots from the installed app, not mockups — it opens full-screen with no browser address bar.
+        </p>
+        <div className="grid grid-cols-2 gap-4 max-w-md mx-auto sm:mx-0">
+          <div className="rounded-2xl overflow-hidden border border-border shadow-sm">
+            <Image
+              src="/omr/screenshots/app-hub.png"
+              alt="Axion Omni OMR Suite app, home screen"
+              width={1080}
+              height={2400}
+              className="w-full h-auto"
+            />
+          </div>
+          <div className="rounded-2xl overflow-hidden border border-border shadow-sm">
+            <Image
+              src="/omr/screenshots/app-product.png"
+              alt="Axion Omni OMR Suite app, marketplace listing"
+              width={1080}
+              height={2400}
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-12">
         <h2 className="flex items-center gap-2 text-lg font-bold mb-1">
           <Smartphone size={20} className="text-brand" />
           How to install
