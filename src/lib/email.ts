@@ -1,6 +1,15 @@
 import "server-only";
 import { Resend } from "resend";
 
+// Recruitment/onboarding emails (quick-signup OTP + "you're listed" notices)
+// use a distinct, human-sounding sender from the transactional EMAIL_FROM —
+// requested explicitly so these read as a welcome/onboarding touchpoint, not
+// a generic no-reply notice. Same verified domain as EMAIL_FROM, since a
+// raw @gmail.com "from" address can't pass SPF/DKIM through Resend and would
+// land in spam or get rejected outright.
+const ONBOARDING_EMAIL_FROM =
+  process.env.ONBOARDING_EMAIL_FROM ?? "TN School Cart Onboarding <onboarding@tnschoolcart.com>";
+
 export async function sendPasswordResetEmail(to: string, resetUrl: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -76,5 +85,64 @@ export async function sendDigitalDeliveryEmail(
     }
   } catch (e) {
     console.error(`[email] Digital delivery email failed for order #${orderShortId}:`, e);
+  }
+}
+
+export async function sendQuickSignupOtpEmail(to: string, name: string, code: string): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("Sign-up email is not configured. Contact support.");
+  }
+
+  const resend = new Resend(apiKey);
+  const { error } = await resend.emails.send({
+    from: ONBOARDING_EMAIL_FROM,
+    to,
+    subject: `Your verification code: ${code}`,
+    html: `
+      <p>Hi ${name},</p>
+      <p>Thanks for signing up with TN School Cart. Enter this code to verify your email address:</p>
+      <p style="font-size: 28px; font-weight: 700; letter-spacing: 4px;">${code}</p>
+      <p>This code expires in 10 minutes. If you didn't request this, you can safely ignore this email.</p>
+    `,
+  });
+
+  if (error) {
+    throw new Error(`Failed to send verification email: ${error.message}`);
+  }
+}
+
+/** Sent once an admin approves a quick-signup and the person's listing goes live. */
+export async function sendQuickSignupApprovedEmail(
+  to: string,
+  name: string,
+  roleLabel: string,
+  setPasswordUrl: string
+): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("[email] Skipping quick-signup approval email — RESEND_API_KEY not configured.");
+    return;
+  }
+
+  const resend = new Resend(apiKey);
+  try {
+    const { error } = await resend.emails.send({
+      from: ONBOARDING_EMAIL_FROM,
+      to,
+      subject: "You're listed on TN School Cart!",
+      html: `
+        <p>Hi ${name},</p>
+        <p>Good news — your ${roleLabel} listing is now live on TN School Cart.</p>
+        <p><a href="${setPasswordUrl}">Set a password for your account</a> to log in anytime and manage
+        your listing, add more products or services, and track activity. This link expires in 1 hour —
+        if it does, use "Forgot password" on the login page with this same email address.</p>
+      `,
+    });
+    if (error) {
+      console.error("[email] Quick-signup approval email failed:", error.message);
+    }
+  } catch (e) {
+    console.error("[email] Quick-signup approval email failed:", e);
   }
 }

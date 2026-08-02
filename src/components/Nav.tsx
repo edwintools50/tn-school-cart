@@ -11,6 +11,7 @@ import {
   Briefcase,
   ShoppingCart,
   LayoutDashboard,
+  GraduationCap,
 } from "lucide-react";
 
 const linkClass =
@@ -48,6 +49,10 @@ export default async function Nav() {
           <Link href="/services" className={linkClass}>
             <Wrench size={16} />
             Find Services
+          </Link>
+          <Link href="/teachers" className={linkClass}>
+            <GraduationCap size={16} />
+            Teachers
           </Link>
           <Link href="/gigs" className={linkClass}>
             <ClipboardList size={16} />

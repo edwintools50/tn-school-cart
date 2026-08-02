@@ -130,6 +130,13 @@ enum ApprovalStatus {
   SUSPENDED
 }
 
+enum QuickSignupStatus {
+  PENDING_VERIFICATION
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
 enum ProductCategory {
   STATIONERY
   FURNITURE
@@ -402,6 +409,51 @@ model JobApplication {
   createdAt    DateTime             @default(now())
 
   @@unique([jobVacancyId, teacherId])
+}
+
+// Staging record for the shareable "quick signup" recruitment forms
+// (/join/teacher, /join/worker, /join/vendor). Never becomes a real User
+// until an admin approves it — see QuickSignupStatus. Only TEACHER, WORKER,
+// and SUPPLIER use this flow; Role is reused rather than a separate enum so
+// the values stay in lockstep with the main Role type.
+model QuickSignup {
+  id     String @id @default(cuid())
+  role   Role
+  name   String
+  email  String
+  phone  String
+  district String
+
+  // Teacher-specific
+  qualification          String?
+  subjectSpecialization  TeachingSubject?
+  experienceYears        Int?
+
+  // Worker/Supplier-specific
+  businessName    String?
+  gigCategory     GigCategory?
+  productCategory ProductCategory?
+
+  // The one "first listing" offering captured on the worker/supplier form —
+  // promoted into a real GigService/Product row on admin approval.
+  offeringTitle       String?
+  offeringDescription String?
+  offeringPrice       Float?
+  offeringUnit        String?
+  offeringStock       Int?
+
+  otpHash      String
+  otpExpiresAt DateTime
+  otpAttempts  Int      @default(0)
+  verifiedAt   DateTime?
+
+  status        QuickSignupStatus @default(PENDING_VERIFICATION)
+  rejectionNote String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([email, role])
+  @@index([status])
 }
 
 model RateLimitAttempt {

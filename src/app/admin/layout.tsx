@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 const tabs = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/users", label: "Users" },
+  { href: "/admin/quick-signups", label: "Quick Signups" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/services", label: "Services" },
   { href: "/admin/orders", label: "Orders" },

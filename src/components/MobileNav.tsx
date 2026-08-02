@@ -16,6 +16,7 @@ import {
   UserPlus,
   LayoutDashboard,
   Smartphone,
+  GraduationCap,
 } from "lucide-react";
 
 type MobileNavUser = {
@@ -90,6 +91,10 @@ export default function MobileNav({
               <Link href="/services" className={itemClass} onClick={close}>
                 <Wrench size={18} className="text-brand" />
                 Find Services
+              </Link>
+              <Link href="/teachers" className={itemClass} onClick={close}>
+                <GraduationCap size={18} className="text-brand" />
+                Teachers
               </Link>
               <Link href="/gigs" className={itemClass} onClick={close}>
                 <ClipboardList size={18} className="text-brand" />

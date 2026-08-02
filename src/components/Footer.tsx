@@ -9,6 +9,9 @@ export default function Footer() {
           <span>Serving schools across all 38 districts of Tamil Nadu</span>
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-1">
+          <Link href="/join" className="hover:text-brand hover:underline font-medium">
+            Join as Teacher / Vendor / Gig Worker
+          </Link>
           <Link href="/terms" className="hover:text-brand hover:underline">
             Terms of Service
           </Link>
