@@ -24,8 +24,10 @@ const inputClass =
   "w-full rounded-lg border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand";
 const labelClass = "block text-sm font-medium mb-1";
 
+type JoinableRole = typeof Role.TEACHER | typeof Role.WORKER | typeof Role.SUPPLIER;
+
 const ROLE_META: Record<
-  Role.TEACHER | Role.WORKER | Role.SUPPLIER,
+  JoinableRole,
   { icon: typeof GraduationCap; title: string; subtitle: string; offeringLabel: string; offeringHint: string }
 > = {
   [Role.TEACHER]: {
@@ -51,7 +53,7 @@ const ROLE_META: Record<
   },
 };
 
-export default function QuickSignupForm({ role }: { role: Role.TEACHER | Role.WORKER | Role.SUPPLIER }) {
+export default function QuickSignupForm({ role }: { role: JoinableRole }) {
   const initialState: JoinState = { step: "form", role };
   const [state, formAction, pending] = useActionState(quickSignupAction, initialState);
   const meta = ROLE_META[role];
