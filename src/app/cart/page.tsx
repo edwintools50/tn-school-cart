@@ -1,10 +1,11 @@
 import { ShoppingBag } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { MARKETPLACE_BUYER_ROLES } from "@/lib/constants";
 import CartItemsClient from "./CartItemsClient";
 
 export default async function CartPage() {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
 
   const cartItems = await db.cartItem.findMany({
     where: { buyerId: user.id },

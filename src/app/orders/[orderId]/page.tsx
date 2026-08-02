@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { MARKETPLACE_BUYER_ROLES } from "@/lib/constants";
 import { whatsappLink } from "@/lib/whatsapp";
 import RazorpayPayButton from "@/components/RazorpayPayButton";
 
@@ -38,7 +39,7 @@ export default async function OrderDetailPage({
   params: Promise<{ orderId: string }>;
 }) {
   const { orderId } = await params;
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
 
   const order = await db.order.findUnique({
     where: { id: orderId },

@@ -3,7 +3,7 @@ import { Search, ShoppingCart, Store, PackageSearch, Sparkles } from "lucide-rea
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { addToCartAction } from "@/app/cart/actions";
-import { PRODUCT_CATEGORY_LABELS } from "@/lib/constants";
+import { MARKETPLACE_BUYER_ROLES, PRODUCT_CATEGORY_LABELS } from "@/lib/constants";
 import { PRODUCT_CATEGORY_ICONS } from "@/lib/categoryIcons";
 import type { ProductCategory } from "@/generated/prisma/enums";
 
@@ -159,7 +159,7 @@ export default async function MarketplacePage({
                     {product.isDigital ? "Instant download" : `${product.stock} in stock`}
                   </p>
 
-                  {user?.role === "PRINCIPAL" ? (
+                  {user && MARKETPLACE_BUYER_ROLES.includes(user.role) ? (
                     <form action={addToCartAction} className="mt-auto pt-1.5">
                       <input type="hidden" name="productId" value={product.id} />
                       <input type="hidden" name="quantity" value="1" />

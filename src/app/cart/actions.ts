@@ -7,9 +7,10 @@ import { db } from "@/lib/db";
 import { notifyNewOrder, notifyOrderPlaced } from "@/lib/whatsapp-notify";
 import { createRazorpayOrder, isRazorpayConfigured } from "@/lib/razorpay";
 import { sendDigitalDeliveryEmail } from "@/lib/email";
+import { MARKETPLACE_BUYER_ROLES } from "@/lib/constants";
 
 export async function addToCartAction(formData: FormData) {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
   const productId = String(formData.get("productId"));
   const quantity = Math.max(1, Number(formData.get("quantity")) || 1);
 
@@ -29,7 +30,7 @@ export async function addToCartAction(formData: FormData) {
 }
 
 export async function updateCartQuantityAction(formData: FormData) {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
   const cartItemId = String(formData.get("cartItemId"));
   const quantity = Math.max(1, Number(formData.get("quantity")) || 1);
 
@@ -41,7 +42,7 @@ export async function updateCartQuantityAction(formData: FormData) {
 }
 
 export async function removeCartItemAction(formData: FormData) {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
   const cartItemId = String(formData.get("cartItemId"));
 
   const item = await db.cartItem.findUnique({ where: { id: cartItemId } });
@@ -52,7 +53,7 @@ export async function removeCartItemAction(formData: FormData) {
 }
 
 export async function placeOrderAction(formData: FormData) {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
 
   const cartItems = await db.cartItem.findMany({
     where: { buyerId: user.id },

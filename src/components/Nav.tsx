@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { logoutAction } from "@/app/(auth)/actions";
 import MobileNav from "@/components/MobileNav";
+import { MARKETPLACE_BUYER_ROLES } from "@/lib/constants";
 import {
   Store,
   Wrench,
@@ -21,7 +22,7 @@ export default async function Nav() {
   const user = await getCurrentUser();
 
   let cartCount = 0;
-  if (user?.role === "PRINCIPAL") {
+  if (user && MARKETPLACE_BUYER_ROLES.includes(user.role)) {
     const items = await db.cartItem.aggregate({
       where: { buyerId: user.id },
       _sum: { quantity: true },
@@ -85,6 +86,11 @@ export default async function Nav() {
               <Link href="/jobs/mine" className={linkClass}>
                 My Job Vacancies
               </Link>
+            </>
+          )}
+
+          {user && MARKETPLACE_BUYER_ROLES.includes(user.role) && (
+            <>
               <Link href="/orders" className={linkClass}>
                 My Orders
               </Link>

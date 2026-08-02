@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { MARKETPLACE_BUYER_ROLES } from "@/lib/constants";
 
 const statusColor: Record<string, string> = {
   PLACED: "bg-blue-100 text-blue-700",
@@ -28,7 +29,7 @@ const statusIcon: Record<string, LucideIcon> = {
 };
 
 export default async function OrdersPage() {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
 
   const orders = await db.order.findMany({
     where: { buyerId: user.id },

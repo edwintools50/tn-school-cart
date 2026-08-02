@@ -25,6 +25,8 @@ type MobileNavUser = {
   status: string;
 } | null;
 
+const MARKETPLACE_BUYER_ROLE_NAMES: string[] = ["PRINCIPAL", "COACHING_CENTRE", "TEACHER"];
+
 const itemClass =
   "flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground/80 hover:bg-background hover:text-brand transition-colors";
 
@@ -105,7 +107,7 @@ export default function MobileNav({
                 Job Vacancies
               </Link>
 
-              {user?.role === "PRINCIPAL" && (
+              {user && MARKETPLACE_BUYER_ROLE_NAMES.includes(user.role) && (
                 <Link href="/cart" className={itemClass} onClick={close}>
                   <ShoppingCart size={18} className="text-brand" />
                   Cart

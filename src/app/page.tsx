@@ -5,6 +5,7 @@ import {
   TEACHING_SUBJECT_LABELS,
   POPULAR_TEACHING_SUBJECTS,
 } from "@/lib/constants";
+import { OMR_SUITE_PRODUCT_ID } from "@/lib/omr/access";
 
 const roleCards = [
   {
@@ -77,32 +78,35 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pt-10">
-        <a
-          href="/omni-omr-suite.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="card flex flex-col sm:flex-row sm:items-center gap-4 p-5 sm:p-6 hover:border-[#e6007e]/60 transition-colors group"
-        >
+        <div className="card flex flex-col sm:flex-row sm:items-center gap-4 p-5 sm:p-6">
           <span className="shrink-0 inline-flex items-center gap-2 rounded-full bg-[#fbe4f1] text-[#a5005c] text-xs font-bold tracking-wide px-3 py-1.5 uppercase self-start sm:self-center">
             <span className="w-1.5 h-1.5 rounded-full bg-[#e6007e]" />
             Featured &middot; Exam &amp; Print Stationery
           </span>
           <div className="flex-1">
             <p className="font-bold">
-              OMNI OMR Suite &mdash; the bubble sheet that grades itself
+              Axion Omni OMR Suite &mdash; the bubble sheet that grades itself
             </p>
             <p className="text-sm text-foreground/70 mt-0.5">
-              Print OMR answer sheets for NEET, JEE, SSC and other competitive exams, scan filled
-              sheets with a phone camera, and get ranked report cards automatically.{" "}
-              <span className="line-through text-foreground/40">Rs. 14,999</span>{" "}
-              <span className="font-semibold text-[#a5005c]">Rs. 4,999 prelaunch offer</span> &mdash;
-              ends Launch Day, 1 Aug 2026.
+              Print OMR answer sheets for NEET, JEE, CUET, CLAT and other competitive exams, scan
+              filled sheets with a phone camera, and get ranked report cards automatically.
             </p>
           </div>
-          <span className="shrink-0 font-semibold text-sm text-[#a5005c] group-hover:underline whitespace-nowrap">
-            See the launch page &rarr;
-          </span>
-        </a>
+          <div className="shrink-0 flex flex-col items-start sm:items-end gap-1.5">
+            <Link
+              href={`/marketplace/${OMR_SUITE_PRODUCT_ID}`}
+              className="font-semibold text-sm text-[#a5005c] hover:underline whitespace-nowrap"
+            >
+              View in Marketplace &rarr;
+            </Link>
+            <Link
+              href="/omr/download"
+              className="font-semibold text-sm text-[#a5005c] hover:underline whitespace-nowrap"
+            >
+              📱 Get the Android app &rarr;
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-12">

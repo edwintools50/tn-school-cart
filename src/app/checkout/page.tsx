@@ -3,11 +3,11 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { placeOrderAction } from "@/app/cart/actions";
-import { TN_DISTRICTS } from "@/lib/constants";
+import { MARKETPLACE_BUYER_ROLES, TN_DISTRICTS } from "@/lib/constants";
 import { isRazorpayConfigured } from "@/lib/razorpay";
 
 export default async function CheckoutPage() {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
 
   const cartItems = await db.cartItem.findMany({
     where: { buyerId: user.id },

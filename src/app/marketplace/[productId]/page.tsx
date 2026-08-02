@@ -4,7 +4,7 @@ import { ArrowLeft, Store, MapPin, Sparkles, ShoppingCart, PackageCheck, Package
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { addToCartAction } from "@/app/cart/actions";
-import { PRODUCT_CATEGORY_LABELS } from "@/lib/constants";
+import { MARKETPLACE_BUYER_ROLES, PRODUCT_CATEGORY_LABELS, ROLE_LABELS } from "@/lib/constants";
 import { PRODUCT_CATEGORY_ICONS } from "@/lib/categoryIcons";
 
 export default async function ProductDetailPage({
@@ -100,7 +100,7 @@ export default async function ProductDetailPage({
           </p>
 
           {/* Desktop / tablet add-to-cart — hidden on mobile in favor of the sticky bar below */}
-          {user?.role === "PRINCIPAL" && product.stock > 0 && (
+          {user && MARKETPLACE_BUYER_ROLES.includes(user.role) && product.stock > 0 && (
             <form action={addToCartAction} className="mt-6 hidden sm:flex items-end gap-3">
               <input type="hidden" name="productId" value={product.id} />
               <div>
@@ -136,6 +136,13 @@ export default async function ProductDetailPage({
             </Link>
           )}
 
+          {user && !MARKETPLACE_BUYER_ROLES.includes(user.role) && (
+            <p className="mt-6 hidden sm:block text-sm text-foreground/60">
+              This account can&apos;t buy from the marketplace &mdash; it&apos;s registered as{" "}
+              {ROLE_LABELS[user.role] ?? user.role}.
+            </p>
+          )}
+
           {product.stock === 0 && (
             <p className="mt-6 flex items-center gap-1.5 text-sm font-semibold text-red-600">
               <PackageX size={16} />
@@ -145,51 +152,57 @@ export default async function ProductDetailPage({
         </div>
       </div>
 
-      {/* Mobile sticky action bar — mirrors the three conditions above (add to
-          cart / log in / out of stock) in a single bar instead of stacking
-          separate fixed elements, since more than one can apply at once
-          (e.g. a signed-out visitor viewing an out-of-stock item). */}
-      {(user?.role === "PRINCIPAL" || !user || product.stock === 0) && (
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface border-t border-border px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] flex flex-col gap-2">
-          {product.stock === 0 && (
-            <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-red-600">
-              <PackageX size={16} />
-              Out of stock
-            </p>
-          )}
+      {/* Mobile sticky action bar — mirrors the four conditions above (add to
+          cart / log in / wrong role / out of stock) in a single bar instead
+          of stacking separate fixed elements, since more than one can apply
+          at once (e.g. a signed-out visitor viewing an out-of-stock item).
+          Every product view falls into exactly one of these four states
+          (no user, PRINCIPAL, a different role, or out of stock), so the
+          bar always has something to show — no outer condition needed. */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface border-t border-border px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] flex flex-col gap-2">
+        {product.stock === 0 && (
+          <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-red-600">
+            <PackageX size={16} />
+            Out of stock
+          </p>
+        )}
 
-          {user?.role === "PRINCIPAL" && product.stock > 0 && (
-            <form action={addToCartAction} className="flex items-center gap-3">
-              <input type="hidden" name="productId" value={product.id} />
-              <input type="hidden" name="quantity" value="1" />
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-brand-dark leading-none">
-                  &#8377;{product.price.toFixed(2)}
-                </p>
-                <p className="text-[11px] text-foreground/50 mt-0.5 truncate">
-                  / {product.unit}
-                </p>
-              </div>
-              <button
-                type="submit"
-                className="flex items-center gap-2 bg-brand text-white text-sm font-semibold rounded-full px-5 py-2.5 hover:bg-brand-dark active:scale-95 transition-all"
-              >
-                <ShoppingCart size={16} />
-                Add to cart
-              </button>
-            </form>
-          )}
+        {user && !MARKETPLACE_BUYER_ROLES.includes(user.role) && (
+          <p className="text-center text-xs text-foreground/60">
+            This account can&apos;t buy from the marketplace &mdash; it&apos;s registered as{" "}
+            {ROLE_LABELS[user.role] ?? user.role}.
+          </p>
+        )}
 
-          {!user && (
-            <Link
-              href="/login"
-              className="flex items-center justify-center w-full border border-border font-semibold rounded-full py-2.5 text-sm hover:border-brand"
+        {user && MARKETPLACE_BUYER_ROLES.includes(user.role) && product.stock > 0 && (
+          <form action={addToCartAction} className="flex items-center gap-3">
+            <input type="hidden" name="productId" value={product.id} />
+            <input type="hidden" name="quantity" value="1" />
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-brand-dark leading-none">
+                &#8377;{product.price.toFixed(2)}
+              </p>
+              <p className="text-[11px] text-foreground/50 mt-0.5 truncate">/ {product.unit}</p>
+            </div>
+            <button
+              type="submit"
+              className="flex items-center gap-2 bg-brand text-white text-sm font-semibold rounded-full px-5 py-2.5 hover:bg-brand-dark active:scale-95 transition-all"
             >
-              Log in to order
-            </Link>
-          )}
-        </div>
-      )}
+              <ShoppingCart size={16} />
+              Add to cart
+            </button>
+          </form>
+        )}
+
+        {!user && (
+          <Link
+            href="/login"
+            className="flex items-center justify-center w-full border border-border font-semibold rounded-full py-2.5 text-sm hover:border-brand"
+          >
+            Log in to order
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

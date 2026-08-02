@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { MARKETPLACE_BUYER_ROLES } from "@/lib/constants";
 import { confirmOrderPayment, verifyCheckoutSignature } from "@/lib/razorpay";
 
 export type PaymentVerifyResult = { ok: boolean; error?: string };
@@ -13,7 +14,7 @@ export async function verifyRazorpayPaymentAction(params: {
   razorpayPaymentId: string;
   razorpaySignature: string;
 }): Promise<PaymentVerifyResult> {
-  const user = await requireUser(["PRINCIPAL"]);
+  const user = await requireUser(MARKETPLACE_BUYER_ROLES);
 
   const order = await db.order.findUnique({ where: { id: params.orderId } });
   if (!order || order.buyerId !== user.id) {
