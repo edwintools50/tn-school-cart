@@ -15,6 +15,7 @@ import {
   LogIn,
   UserPlus,
   LayoutDashboard,
+  Smartphone,
 } from "lucide-react";
 
 type MobileNavUser = {
@@ -71,6 +72,17 @@ export default function MobileNav({
           <div className="fixed inset-0 bg-black/30 z-30" onClick={close} />
           <div className="absolute left-0 right-0 top-full mt-px bg-surface border-b border-border shadow-lg z-40 max-h-[80vh] overflow-y-auto">
             <nav className="flex flex-col py-2">
+              <Link
+                href="/download"
+                className="flex items-center gap-3 mx-2 my-1 px-3 py-2.5 rounded-xl bg-accent/10 text-sm font-semibold text-accent"
+                onClick={close}
+              >
+                <Smartphone size={18} />
+                Get the Android App
+              </Link>
+
+              <div className="border-t border-border my-1" />
+
               <Link href="/marketplace" className={itemClass} onClick={close}>
                 <Store size={18} className="text-brand" />
                 Marketplace
