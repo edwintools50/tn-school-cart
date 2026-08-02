@@ -51,6 +51,13 @@ export default async function OmrHubPage() {
           {!user && <p className="text-xs text-foreground/50 mt-3">You&apos;ll need to log in to purchase.</p>}
         </div>
       )}
+
+      <p className="text-sm text-foreground/60 mt-6 text-center">
+        Prefer an app?{" "}
+        <Link href="/omr/download" className="text-brand hover:underline font-medium">
+          Download for Android
+        </Link>
+      </p>
     </div>
   );
 }

@@ -9,5 +9,16 @@
         "DC:DE:FC:D2:48:D8:D7:06:06:7E:39:0D:93:AA:B3:0B:FE:DF:D2:A6:BA:9E:7B:E6:D3:AF:39:DC:D9:F9:7E:6E"
       ]
     }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.tnschoolcart.omrsuite",
+      "sha256_cert_fingerprints": [
+        "2C:3C:1A:68:A4:DD:63:E0:B3:A3:36:4D:E6:81:9C:07:93:DB:9C:1B:C8:42:F5:F6:03:E2:5C:BC:10:9F:ED:A0",
+        "49:36:09:C7:F1:CA:35:FE:A8:0C:42:88:E8:F7:78:34:6E:99:0A:90:99:16:3F:6F:BC:AB:E6:EE:C1:AC:7C:B0"
+      ]
+    }
   }
 ]
