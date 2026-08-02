@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Store, MapPin, Sparkles, ShoppingCart, PackageCheck, PackageX } from "lucide-react";
+import { ArrowLeft, Store, MapPin, Sparkles, PackageCheck, PackageX } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { addToCartAction } from "@/app/cart/actions";
 import { MARKETPLACE_BUYER_ROLES, PRODUCT_CATEGORY_LABELS, ROLE_LABELS } from "@/lib/constants";
 import { PRODUCT_CATEGORY_ICONS } from "@/lib/categoryIcons";
+import AddToCartSubmitButton from "@/components/AddToCartSubmitButton";
 
 export default async function ProductDetailPage({
   params,
@@ -117,13 +118,7 @@ export default async function ProductDetailPage({
                   className="w-24 rounded-md border border-border px-3 py-2 text-sm"
                 />
               </div>
-              <button
-                type="submit"
-                className="flex items-center gap-2 bg-brand text-white font-semibold rounded-md px-5 py-2 hover:bg-brand-dark transition-colors"
-              >
-                <ShoppingCart size={16} />
-                Add to cart
-              </button>
+              <AddToCartSubmitButton className="flex items-center gap-2 bg-brand text-white font-semibold rounded-md px-5 py-2 hover:bg-brand-dark transition-colors" />
             </form>
           )}
 
@@ -184,13 +179,7 @@ export default async function ProductDetailPage({
               </p>
               <p className="text-[11px] text-foreground/50 mt-0.5 truncate">/ {product.unit}</p>
             </div>
-            <button
-              type="submit"
-              className="flex items-center gap-2 bg-brand text-white text-sm font-semibold rounded-full px-5 py-2.5 hover:bg-brand-dark active:scale-95 transition-all"
-            >
-              <ShoppingCart size={16} />
-              Add to cart
-            </button>
+            <AddToCartSubmitButton className="flex items-center gap-2 bg-brand text-white text-sm font-semibold rounded-full px-5 py-2.5 hover:bg-brand-dark active:scale-95 transition-all" />
           </form>
         )}
 

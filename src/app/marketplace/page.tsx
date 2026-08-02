@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Search, ShoppingCart, Store, PackageSearch, Sparkles } from "lucide-react";
+import { Search, Store, PackageSearch, Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { addToCartAction } from "@/app/cart/actions";
 import { MARKETPLACE_BUYER_ROLES, PRODUCT_CATEGORY_LABELS } from "@/lib/constants";
 import { PRODUCT_CATEGORY_ICONS } from "@/lib/categoryIcons";
+import AddToCartSubmitButton from "@/components/AddToCartSubmitButton";
 import type { ProductCategory } from "@/generated/prisma/enums";
 
 function categoryHref(key: string, q?: string) {
@@ -163,13 +164,10 @@ export default async function MarketplacePage({
                     <form action={addToCartAction} className="mt-auto pt-1.5">
                       <input type="hidden" name="productId" value={product.id} />
                       <input type="hidden" name="quantity" value="1" />
-                      <button
-                        type="submit"
+                      <AddToCartSubmitButton
                         className="w-full flex items-center justify-center gap-1.5 bg-brand text-white text-xs font-semibold rounded-lg py-2 hover:bg-brand-dark active:scale-95 transition-all"
-                      >
-                        <ShoppingCart size={13} />
-                        Add to cart
-                      </button>
+                        iconSize={13}
+                      />
                     </form>
                   ) : !user ? (
                     <Link
