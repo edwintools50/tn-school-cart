@@ -31,6 +31,11 @@ const nextConfig: NextConfig = {
   // cross-origin dev requests by default since 15.3 to prevent DNS rebinding.
   // Dev-only; has no effect on production builds.
   allowedDevOrigins: ["10.240.184.226"],
+  // pdfkit resolves its built-in font metrics (Helvetica.afm etc.) via
+  // fs.readFileSync at a path relative to its own __dirname at runtime —
+  // bundling it rewrites that path and breaks the lookup. Keeping it as a
+  // real node_modules require (not bundled) is the standard fix.
+  serverExternalPackages: ["pdfkit"],
   experimental: {
     // Default is 1MB, too small for digital-product/resume/photo uploads.
     // Kept under Vercel's ~4.5MB serverless function request body ceiling.
