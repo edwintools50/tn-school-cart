@@ -10,7 +10,7 @@ export default function PrivacyPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 w-full">
       <h1 className="text-2xl font-bold mb-1">Privacy Policy</h1>
-      <p className="text-xs text-foreground/50 mb-6">Last updated: 20 July 2026</p>
+      <p className="text-xs text-foreground/50 mb-6">Last updated: 2 August 2026</p>
 
       <div className="card p-6 sm:p-8">
         <p className={bodyClass}>
@@ -47,9 +47,11 @@ export default function PrivacyPage() {
           <p className={bodyClass}>
             We share only what is necessary with the service providers that
             power the Platform: Razorpay (payment processing), Meta/WhatsApp
-            (order and gig notifications), Vercel Blob (photo storage), and
-            Neon (database hosting). We do not sell your personal information
-            to third parties.
+            (order and gig notifications), Vercel Blob (photo storage), Neon
+            (database hosting), Resend (order and delivery emails), and Sentry
+            (error diagnostics, which may incidentally include device and
+            request information). We do not sell your personal information to
+            third parties.
           </p>
         </div>
 
