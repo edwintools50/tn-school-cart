@@ -14,7 +14,7 @@ const cspHeader = `
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob: https://*.public.blob.vercel-storage.com;
   font-src 'self';
-  connect-src 'self' https://*.razorpay.com https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://*.ingest.sentry.io;
+  connect-src 'self' https://*.razorpay.com https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://*.ingest.sentry.io https://*.public.blob.vercel-storage.com;
   frame-src https://*.razorpay.com;
   object-src 'none';
   base-uri 'self';
