@@ -8,11 +8,21 @@ import { notifyNewOrder, notifyOrderPlaced } from "@/lib/whatsapp-notify";
 import { createRazorpayOrder, isRazorpayConfigured } from "@/lib/razorpay";
 import { sendDigitalDeliveryEmail } from "@/lib/email";
 import { MARKETPLACE_BUYER_ROLES } from "@/lib/constants";
+import { OMR_SUITE_PRODUCT_ID } from "@/lib/omr/constants";
+
+// The OMR Suite grants access per account, not per unit purchased (see
+// hasOmrAccess) — quantity > 1 doesn't create extra seats, it would just
+// silently overcharge a buyer who assumed it did. Pinning it to 1 here is
+// the actual enforcement point; the cart/product-page UI also hides the
+// quantity control for this product, but a client can still POST any value.
+function clampQuantity(productId: string, quantity: number): number {
+  return productId === OMR_SUITE_PRODUCT_ID ? 1 : quantity;
+}
 
 export async function addToCartAction(formData: FormData) {
   const user = await requireUser(MARKETPLACE_BUYER_ROLES);
   const productId = String(formData.get("productId"));
-  const quantity = Math.max(1, Number(formData.get("quantity")) || 1);
+  const quantity = clampQuantity(productId, Math.max(1, Number(formData.get("quantity")) || 1));
 
   const product = await db.product.findUnique({ where: { id: productId } });
   if (!product || product.status !== "APPROVED") {
@@ -22,7 +32,10 @@ export async function addToCartAction(formData: FormData) {
   await db.cartItem.upsert({
     where: { buyerId_productId: { buyerId: user.id, productId } },
     create: { buyerId: user.id, productId, quantity },
-    update: { quantity: { increment: quantity } },
+    update:
+      productId === OMR_SUITE_PRODUCT_ID
+        ? { quantity: 1 }
+        : { quantity: { increment: quantity } },
   });
 
   revalidatePath("/cart");
@@ -32,11 +45,12 @@ export async function addToCartAction(formData: FormData) {
 export async function updateCartQuantityAction(formData: FormData) {
   const user = await requireUser(MARKETPLACE_BUYER_ROLES);
   const cartItemId = String(formData.get("cartItemId"));
-  const quantity = Math.max(1, Number(formData.get("quantity")) || 1);
+  const requestedQuantity = Math.max(1, Number(formData.get("quantity")) || 1);
 
   const item = await db.cartItem.findUnique({ where: { id: cartItemId } });
   if (!item || item.buyerId !== user.id) throw new Error("Not found");
 
+  const quantity = clampQuantity(item.productId, requestedQuantity);
   await db.cartItem.update({ where: { id: cartItemId }, data: { quantity } });
   revalidatePath("/cart");
 }

@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { addToCartAction } from "@/app/cart/actions";
 import { MARKETPLACE_BUYER_ROLES, PRODUCT_CATEGORY_LABELS, ROLE_LABELS } from "@/lib/constants";
 import { PRODUCT_CATEGORY_ICONS } from "@/lib/categoryIcons";
+import { OMR_SUITE_PRODUCT_ID } from "@/lib/omr/constants";
 import AddToCartSubmitButton from "@/components/AddToCartSubmitButton";
 
 export default async function ProductDetailPage({
@@ -104,20 +105,24 @@ export default async function ProductDetailPage({
           {user && MARKETPLACE_BUYER_ROLES.includes(user.role) && product.stock > 0 && (
             <form action={addToCartAction} className="mt-6 hidden sm:flex items-end gap-3">
               <input type="hidden" name="productId" value={product.id} />
-              <div>
-                <label className="block text-xs font-medium mb-1" htmlFor="quantity">
-                  Quantity
-                </label>
-                <input
-                  id="quantity"
-                  name="quantity"
-                  type="number"
-                  min={1}
-                  max={product.stock}
-                  defaultValue={1}
-                  className="w-24 rounded-md border border-border px-3 py-2 text-sm"
-                />
-              </div>
+              {product.id === OMR_SUITE_PRODUCT_ID ? (
+                <input type="hidden" name="quantity" value="1" />
+              ) : (
+                <div>
+                  <label className="block text-xs font-medium mb-1" htmlFor="quantity">
+                    Quantity
+                  </label>
+                  <input
+                    id="quantity"
+                    name="quantity"
+                    type="number"
+                    min={1}
+                    max={product.stock}
+                    defaultValue={1}
+                    className="w-24 rounded-md border border-border px-3 py-2 text-sm"
+                  />
+                </div>
+              )}
               <AddToCartSubmitButton className="flex items-center gap-2 bg-brand text-white font-semibold rounded-md px-5 py-2 hover:bg-brand-dark transition-colors" />
             </form>
           )}

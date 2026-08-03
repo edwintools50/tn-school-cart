@@ -2,12 +2,9 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireApprovedUser } from "@/lib/auth";
+import { OMR_SUITE_PRODUCT_ID } from "./constants";
 
-// The OMNI OMR Suite marketplace listing — there is only ever one, so it's
-// simplest to hardcode its id here rather than build product-discovery
-// infra nobody else needs. Created once via a one-off script; see the OMR
-// Phase 6 notes for how to recreate it if this product is ever deleted.
-export const OMR_SUITE_PRODUCT_ID = "cmsbv6l350000fwrvlz6lnjhm";
+export { OMR_SUITE_PRODUCT_ID };
 
 /**
  * Paid-order-based access: does this user have any OrderItem for the OMNI

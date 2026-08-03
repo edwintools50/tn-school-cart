@@ -243,6 +243,21 @@ model User {
   omrResults        OmrResult[]
   omrBranding       OmrBranding?
   omrGeneratedSheets OmrGeneratedSheet[]
+  sessions          Session[]
+}
+
+// One row per active login (device/browser), keyed by an id embedded in
+// that login's JWT — lets us revoke a specific login (or all but the
+// current one) and enforce a soft cap on how many can be active at once,
+// neither of which a bare stateless JWT can do on its own.
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Product {
