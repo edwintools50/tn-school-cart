@@ -1,26 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f9fc;
-  --foreground: #14213d;
-  --brand: #145c9e;
-  --brand-dark: #0d3f6e;
-  --accent: #1a8f5e;
-  --accent-dark: #136b46;
+  /* Warm paper + ink, not the generic cool-grey SaaS palette — deep navy
+     carries trust/authority for a school-facing marketplace, muted gold
+     reads as "achievement" without tipping into the cliché terracotta. */
+  --background: #faf8f3;
+  --foreground: #1c2333;
+  --foreground-muted: #5b5f6e;
+  --brand: #1e3a5f;
+  --brand-dark: #142943;
+  --brand-light: #eef2f7;
+  --accent: #2f7a4f;
+  --accent-dark: #1f5636;
+  --gold: #b8862f;
+  --gold-dark: #8f691f;
+  --gold-light: #f6ecd9;
   --surface: #ffffff;
-  --border: #e2e8f0;
+  --border: #e6ddc9;
+  --radius-card: 1rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
+  --color-brand-light: var(--brand-light);
   --color-accent: var(--accent);
   --color-accent-dark: var(--accent-dark);
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-light: var(--gold-light);
   --color-surface: var(--surface);
   --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -30,8 +45,19 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+h1, h2, h3, .font-display {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 2px rgba(28, 35, 51, 0.04), 0 8px 24px -12px rgba(28, 35, 51, 0.08);
+}
+
+::selection {
+  background: var(--gold-light);
+  color: var(--brand-dark);
 }

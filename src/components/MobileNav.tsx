@@ -64,7 +64,7 @@ export default function MobileNav({
       >
         {open ? <X size={22} /> : <Menu size={22} />}
         {!open && cartCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center bg-accent text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1">
+          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center bg-gold text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1">
             {cartCount}
           </span>
         )}
@@ -77,7 +77,7 @@ export default function MobileNav({
             <nav className="flex flex-col py-2">
               <Link
                 href="/download"
-                className="flex items-center gap-3 mx-2 my-1 px-3 py-2.5 rounded-xl bg-accent/10 text-sm font-semibold text-accent"
+                className="flex items-center gap-3 mx-2 my-1 px-3 py-2.5 rounded-xl bg-gold-light text-sm font-semibold text-gold-dark"
                 onClick={close}
               >
                 <Smartphone size={18} />
@@ -163,7 +163,7 @@ export default function MobileNav({
                     Log in
                   </Link>
                   <Link href="/register" className={itemClass} onClick={close}>
-                    <UserPlus size={18} className="text-accent" />
+                    <UserPlus size={18} className="text-gold" />
                     Sign up
                   </Link>
                 </>

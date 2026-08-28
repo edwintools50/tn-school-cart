@@ -4,7 +4,6 @@ import { useOptimistic } from "react";
 import Link from "next/link";
 import { ShoppingBag, Store, Trash2, ArrowRight } from "lucide-react";
 import { updateCartQuantityAction, removeCartItemAction } from "./actions";
-import { OMR_SUITE_PRODUCT_ID } from "@/lib/omr/constants";
 
 type CartItemView = {
   id: string;
@@ -98,27 +97,23 @@ export default function CartItemsClient({ initialItems }: { initialItems: CartIt
               </p>
 
               <div className="flex items-center justify-between gap-2 mt-auto pt-2">
-                {item.productId === OMR_SUITE_PRODUCT_ID ? (
-                  <span className="text-xs text-foreground/50">Qty: 1 (one license per account)</span>
-                ) : (
-                  <form action={handleUpdate} className="flex items-center gap-1.5">
-                    <input type="hidden" name="cartItemId" value={item.id} />
-                    <input
-                      type="number"
-                      name="quantity"
-                      min={1}
-                      max={item.product.stock}
-                      defaultValue={item.quantity}
-                      className="w-14 rounded-md border border-border px-2 py-1 text-xs"
-                    />
-                    <button
-                      type="submit"
-                      className="text-[11px] font-semibold text-brand hover:underline"
-                    >
-                      Update
-                    </button>
-                  </form>
-                )}
+                <form action={handleUpdate} className="flex items-center gap-1.5">
+                  <input type="hidden" name="cartItemId" value={item.id} />
+                  <input
+                    type="number"
+                    name="quantity"
+                    min={1}
+                    max={item.product.stock}
+                    defaultValue={item.quantity}
+                    className="w-14 rounded-md border border-border px-2 py-1 text-xs"
+                  />
+                  <button
+                    type="submit"
+                    className="text-[11px] font-semibold text-brand hover:underline"
+                  >
+                    Update
+                  </button>
+                </form>
 
                 <form action={handleRemove}>
                   <input type="hidden" name="cartItemId" value={item.id} />

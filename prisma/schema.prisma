@@ -239,10 +239,6 @@ model User {
   gigOffers      GigOffer[]     @relation("WorkerGigOffers")
   jobVacancies   JobVacancy[]   @relation("PrincipalJobVacancies")
   jobApplications JobApplication[] @relation("TeacherJobApplications")
-  omrExamConfigs    OmrExamConfig[]
-  omrResults        OmrResult[]
-  omrBranding       OmrBranding?
-  omrGeneratedSheets OmrGeneratedSheet[]
   sessions          Session[]
 }
 
@@ -473,100 +469,6 @@ model QuickSignup {
 
   @@unique([email, role])
   @@index([status])
-}
-
-// --- OMNI OMR Suite (ported from the standalone desktop app) ---
-// Everything below is scoped to a single owning User, unlike the desktop
-// app's one-machine/one-global-config model — each buyer gets their own
-// private exam configs, results, branding, and generated sheets.
-
-model OmrExamConfig {
-  id       String @id @default(cuid())
-  ownerId  String
-  owner    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-
-  examTitle String
-  // [{ name: string, count: number }]
-  subjects  Json
-  // { marksCorrect, marksWrong, marksUnattempted, marksMultiple }
-  rules     Json
-  // Which booklet-code letters are in play for this exam, e.g. ["P"] or ["P","Q","R","S"]
-  activeSets String[] @default(["P"])
-  // { P: { "1": "A", "2": "C", ... }, Q: {...}, ... } — one full answer key per active set
-  answerKeys Json
-  sheetsExportEmail String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  results OmrResult[]
-
-  @@index([ownerId])
-}
-
-model OmrResult {
-  id           String        @id @default(cuid())
-  examConfigId String
-  examConfig   OmrExamConfig @relation(fields: [examConfigId], references: [id], onDelete: Cascade)
-  // Denormalized alongside examConfigId so access-control and the progress
-  // tracker / dashboard can query directly by owner without a join.
-  ownerId      String
-  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-
-  rollNumber       String
-  // Only ever set if a roster batch's pre-printed name could be matched
-  // back up, or an operator typed it in manually — auto-scan never reads
-  // handwritten/printed names via OCR, only the roll-number bubble grid.
-  studentName      String?
-  score            Float
-  correctCount     Int
-  wrongCount       Int
-  unattemptedCount Int
-  multipleCount    Int
-  // scoring.js's scoreExam().details — per-question breakdown
-  details          Json
-  bookletSeries    String?
-  setWarning       String?
-  uploadImageUrl   String
-  overlayImageUrl  String
-  // Snapshot of the exam's title/question count at scan time, so results
-  // stay meaningful even if the exam config is later edited or deleted —
-  // this is also dashboardStats.js's groupKey() axis (group by exam).
-  examTitle        String
-  totalQuestions   Int
-
-  createdAt DateTime @default(now())
-
-  @@index([ownerId])
-  @@index([examConfigId])
-  @@index([rollNumber])
-}
-
-model OmrBranding {
-  id            String  @id @default(cuid())
-  ownerId       String  @unique
-  owner         User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  instituteName String?
-  primaryColor  String  @default("#1E3A8A")
-  logoUrl       String?
-  updatedAt     DateTime @updatedAt
-}
-
-// A history of generated sheet/batch PDFs, so a user can re-download
-// something they made earlier — the desktop app kept these forever in a
-// local "Generated OMR Sheets" folder; this is the DB-backed equivalent
-// pointing at Blob storage instead.
-model OmrGeneratedSheet {
-  id           String   @id @default(cuid())
-  ownerId      String
-  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  title        String
-  fileUrl      String
-  isBatch      Boolean  @default(false)
-  studentCount Int?
-  createdAt    DateTime @default(now())
-
-  @@index([ownerId])
 }
 
 model RateLimitAttempt {

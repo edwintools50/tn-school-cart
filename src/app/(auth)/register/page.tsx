@@ -13,8 +13,8 @@ import {
 } from "@/lib/constants";
 
 const inputClass =
-  "w-full rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand";
-const labelClass = "block text-sm font-medium mb-1";
+  "w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-shadow";
+const labelClass = "block text-sm font-medium mb-1.5";
 
 export default function RegisterPage() {
   const [state, formAction, pending] = useActionState(registerAction, undefined);
@@ -23,10 +23,10 @@ export default function RegisterPage() {
   >("PRINCIPAL");
 
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-12">
+    <div className="flex-1 flex items-center justify-center px-4 py-16">
       <div className="card w-full max-w-lg p-8">
-        <h1 className="text-2xl font-bold mb-1">Create your account</h1>
-        <p className="text-sm text-foreground/60 mb-6">
+        <h1 className="font-display text-2xl font-semibold mb-1">Create your account</h1>
+        <p className="text-sm text-foreground-muted mb-6">
           Join as a school buyer, a supplier, a gig worker, a teacher looking for a job, or a
           coaching centre hiring teachers.
         </p>
@@ -37,10 +37,10 @@ export default function RegisterPage() {
               key={r}
               type="button"
               onClick={() => setRole(r)}
-              className={`text-xs sm:text-sm font-semibold rounded-md border px-2 py-2 transition-colors ${
+              className={`text-xs sm:text-sm font-semibold rounded-xl border px-2 py-2.5 transition-colors ${
                 role === r
                   ? "bg-brand text-white border-brand"
-                  : "border-border text-foreground/70 hover:border-brand"
+                  : "border-border text-foreground-muted hover:border-brand"
               }`}
             >
               {r === "PRINCIPAL" && "Principal (Buyer)"}
@@ -330,7 +330,7 @@ export default function RegisterPage() {
           )}
 
           {role !== "PRINCIPAL" && (
-            <p className="text-xs text-foreground/60 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+            <p className="text-xs text-gold-dark bg-gold-light border border-gold/30 rounded-xl px-3 py-2.5">
               {ROLE_LABELS[role]} accounts are reviewed by the TN School Cart admin
               team before you can{" "}
               {role === "TEACHER"
@@ -343,7 +343,7 @@ export default function RegisterPage() {
           )}
 
           {state?.error && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+            <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5">
               {state.error}
             </p>
           )}
@@ -351,15 +351,15 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full bg-brand text-white font-semibold rounded-md py-2 hover:bg-brand-dark transition-colors disabled:opacity-60"
+            className="w-full bg-brand text-white font-semibold rounded-xl py-2.5 hover:bg-brand-dark transition-colors disabled:opacity-60"
           >
             {pending ? "Creating account..." : "Create account"}
           </button>
         </form>
 
-        <p className="text-sm text-foreground/60 mt-6">
+        <p className="text-sm text-foreground-muted mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-brand font-medium hover:underline">
+          <Link href="/login" className="text-brand font-semibold hover:underline">
             Log in
           </Link>
         </p>

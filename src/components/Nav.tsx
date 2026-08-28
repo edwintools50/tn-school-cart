@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 const linkClass =
-  "flex items-center gap-1.5 text-sm font-medium text-foreground/80 hover:text-brand transition-colors";
+  "flex items-center gap-1.5 text-sm font-medium text-foreground-muted hover:text-brand transition-colors";
 
 export default async function Nav() {
   const user = await getCurrentUser();
@@ -31,14 +31,13 @@ export default async function Nav() {
   }
 
   return (
-    <header className="border-b border-border bg-surface sticky top-0 z-20">
-      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <Image src="/logo.svg" alt="TN School Cart" width={36} height={36} />
-          <span className="font-bold text-lg leading-tight">
-            <span className="text-brand">TN </span>
-            <span className="text-[#d43a2f]">School </span>
-            <span className="text-accent">Cart</span>
+    <header className="border-b border-border bg-surface/95 backdrop-blur sticky top-0 z-20">
+      <div className="mx-auto max-w-6xl px-4 py-3.5 flex items-center justify-between gap-4">
+        <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <Image src="/logo.svg" alt="TN School Cart" width={34} height={34} />
+          <span className="font-display font-semibold text-lg leading-tight tracking-tight">
+            <span className="text-brand">TN School </span>
+            <span className="text-gold">Cart</span>
           </span>
         </Link>
 
@@ -71,7 +70,7 @@ export default async function Nav() {
               </Link>
               <Link
                 href="/register"
-                className="text-sm font-semibold bg-brand text-white px-3 py-1.5 rounded-md hover:bg-brand-dark transition-colors"
+                className="text-sm font-semibold bg-brand text-white px-4 py-1.5 rounded-full hover:bg-brand-dark transition-colors"
               >
                 Sign up
               </Link>
@@ -98,7 +97,7 @@ export default async function Nav() {
                 <ShoppingCart size={16} />
                 Cart
                 {cartCount > 0 && (
-                  <span className="ml-1 inline-flex items-center justify-center bg-accent text-white text-xs rounded-full h-5 min-w-5 px-1">
+                  <span className="ml-1 inline-flex items-center justify-center bg-gold text-white text-xs rounded-full h-5 min-w-5 px-1">
                     {cartCount}
                   </span>
                 )}

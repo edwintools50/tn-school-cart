@@ -2,9 +2,9 @@ import type { Role } from "@/generated/prisma/enums";
 
 // Which account roles can buy from the marketplace (cart/checkout/orders).
 // School buyers are the obvious case; Coaching Centres and Teachers were
-// added so they can also purchase things like the OMR Suite for their own
-// use, not just school procurement. Suppliers/Workers/Admin are excluded —
-// they're the supply side, not buyers.
+// added so they can also purchase things for their own use, not just school
+// procurement. Suppliers/Workers/Admin are excluded — they're the supply
+// side, not buyers.
 export const MARKETPLACE_BUYER_ROLES: Role[] = ["PRINCIPAL", "COACHING_CENTRE", "TEACHER"];
 
 export const TN_DISTRICTS = [
